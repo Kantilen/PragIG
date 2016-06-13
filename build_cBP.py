@@ -30,23 +30,26 @@ def create_circular_graph():
     for key, value in adjacencies_a.items():
         if key in visited or value in visited:
             continue
-    #TODO: Different telomeres! Currently there is only on telomere node.
-        if not value:
-            if not adjacencies_b[key]:
-                G.add_edge(key, 'Telomere')
-                G.add_edge('Telomere', key)
-            else:
-                G.add_edge(key, 'Telomere')
-        else:
-            visited.append(value)
-            G.add_edge(key,value)
-            if adjacencies_b[key]:
-                G.add_edge(key, adjacencies_b[key])
-            else:
-                G.add_edge(key, 'Telomere')
-            G.add_edge(value, adjacencies_b[value])
         visited.append(key)
+        if value:
+            visited.append(value)
+            G.add_edge(key,value, color='A')
 
-    print G.nodes()
-    print G.edges()
-    print [x for x in nx.connected_components(G)]
+            if adjacencies_b[key] == value or adjacencies_b[value] == key:
+                G.add_edge(key, adjacencies_b[key], color='B')
+                continue
+
+            if adjacencies_b[key]:
+                G.add_edge(key, adjacencies_b[key], color='B')
+            if adjacencies_b[value]:
+                G.add_edge(value, adjacencies_b[value], color='B')
+
+
+    components = [x for x in nx.connected_component_subgraphs(G)]
+    for comp in components:
+        try:
+            nx.find_cycle(comp)
+        except nx.exception.NetworkXNoCycle:
+            print "Path found {}".format(comp.edges())
+
+
