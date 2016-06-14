@@ -46,10 +46,31 @@ def create_circular_graph():
 
 
     components = [x for x in nx.connected_component_subgraphs(G)]
+
+    print [x for x in nx.connected_components(G)]
+
+    index = 0
+
     for comp in components:
-        try:
-            nx.find_cycle(comp)
-        except nx.exception.NetworkXNoCycle:
-            print "Path found {}".format(comp.edges())
 
+        degree_of_comp = comp.degree()
+        #print degree_of_comp
+        telomeres = [vertex for vertex,degree in degree_of_comp.items() if degree == 1]
 
+        if len(telomeres) == 2:
+            G.add_node("Telo%d" % (index))
+            G.add_node("Telo%d" % (index + 1))
+            if G.edge[telomeres[0]][telomeres[1]][0]['color'] == 'A':
+                G.add_edge("Telo%d" % (index), "Telo%d" % (index + 1), color='A')
+                G.add_edge("Telo%d" % (index), telomeres[0], color='B')
+                G.add_edge("Telo%d" % (index + 1), telomeres[1], color='B')
+            else:
+                G.add_edge("Telo%d" % (index), "Telo%d" % (index + 1), color='B')
+                G.add_edge("Telo%d" % (index), telomeres[0], color='A')
+                G.add_edge("Telo%d" % (index + 1), telomeres[1], color='A')
+
+        elif len(telomeres) == 1:
+            print "Do one telomere"
+
+    print [x for x in nx.connected_components(G)]
+    print G.edges()
