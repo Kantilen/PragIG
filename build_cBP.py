@@ -7,6 +7,8 @@ __author__ = 'klamkiewicz'
 
 adjacencies_a = {}
 adjacencies_b = {}
+colors = {'A' : 'B',
+          'B' : 'A'}
 
 def connect_adjacencies(adjA, adjB):
 
@@ -21,7 +23,7 @@ def connect_adjacencies(adjA, adjB):
                 adjacencies[single_extremity.group(1)] = single_extremity.group(2)
                 adjacencies[single_extremity.group(2)] = single_extremity.group(1)
 
-    create_circular_graph()
+    return create_circular_graph()
 
 def create_circular_graph():
     G = nx.MultiGraph()
@@ -46,31 +48,44 @@ def create_circular_graph():
 
 
     components = [x for x in nx.connected_component_subgraphs(G)]
-
-    print [x for x in nx.connected_components(G)]
-
     index = 0
 
     for comp in components:
 
+        if len(comp) == 1:
+            G.add_node("Telo%d" % (index))
+            G.add_edge("Telo%d" % (index), comp.nodes()[0], color='A')
+            G.add_edge("Telo%d" % (index), comp.nodes()[0], color='B')
+            index += 1
+            continue
+
         degree_of_comp = comp.degree()
-        #print degree_of_comp
         telomeres = [vertex for vertex,degree in degree_of_comp.items() if degree == 1]
 
         if len(telomeres) == 2:
-            G.add_node("Telo%d" % (index))
-            G.add_node("Telo%d" % (index + 1))
-            if G.edge[telomeres[0]][telomeres[1]][0]['color'] == 'A':
-                G.add_edge("Telo%d" % (index), "Telo%d" % (index + 1), color='A')
-                G.add_edge("Telo%d" % (index), telomeres[0], color='B')
-                G.add_edge("Telo%d" % (index + 1), telomeres[1], color='B')
+            data_telo = G.edges(telomeres, True)
+            if len(data_telo) == 1:
+                first_color = second_color = data_telo[0][2]['color']
+                first_telo = data_telo[0][0]
+                second_telo = data_telo[0][1]
             else:
-                G.add_edge("Telo%d" % (index), "Telo%d" % (index + 1), color='B')
-                G.add_edge("Telo%d" % (index), telomeres[0], color='A')
-                G.add_edge("Telo%d" % (index + 1), telomeres[1], color='A')
+                first_color = data_telo[0][2]['color']
+                second_color = data_telo[1][2]['color']
+                first_telo = data_telo[0][0]
+                second_telo = data_telo[1][0]
 
-        elif len(telomeres) == 1:
-            print "Do one telomere"
-
-    print [x for x in nx.connected_components(G)]
-    print G.edges()
+            if first_color == second_color:
+                G.add_node("Telo%d" % (index))
+                G.add_node("Telo%d" % (index + 1))
+                G.add_edge("Telo%d" % (index), "Telo%d" % (index + 1), color=first_color)
+                G.add_edge(first_telo, "Telo%d" % (index), color=colors[first_color])
+                G.add_edge(second_telo, "Telo%d" % (index + 1), color=colors[first_color])
+                index += 2
+                continue
+            else:
+                G.add_node("Telo%d" % (index))
+                for telo,neighbor,color in data_telo:
+                    G.add_edge(telo, "Telo%d" % (index), color=colors[color['color']])
+                index += 1
+                continue
+    return G

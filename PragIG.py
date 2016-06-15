@@ -3,6 +3,8 @@
 import argparse as args
 import re
 import sys
+import networkx as nx
+
 
 import adjacency_creation
 import build_cBP
@@ -45,4 +47,4 @@ if not same_content[0]:
 adjacency_setA = adjacency_creation.create_adjacency_set(arguments.genomeA)
 adjacency_setB = adjacency_creation.create_adjacency_set(arguments.genomeB)
 
-build_cBP.connect_adjacencies(adjacency_setA, adjacency_setB)
+circular_breakpoint = build_cBP.connect_adjacencies(adjacency_setA, adjacency_setB)
