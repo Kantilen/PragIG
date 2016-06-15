@@ -18,17 +18,19 @@ def perform_DCJ(graph):
 
     all_edges = graph.edges(data=True)
 
+    for first, second, color in all_edges:
+        if first.startswith('Telo') and not second.startswith('Telo'):
+            intermediate_adjacencies.append('%s' % (second))
+            continue
+        if second.startswith('Telo') and not first.startswith('Telo'):
+            intermediate_adjacencies.append('%s' % (first))
+            continue
+        if first.startswith('Telo') and second.startswith('Telo'):
+            continue
+        intermediate_adjacencies.append('%s%s' % (first, second))
+
     just_a_edges = [x for x in all_edges if x[2]['color'] == 'A']
-    just_b_edges = [x for x in all_edges if x[2]['color'] == 'B']
     print just_a_edges
     print
     print
-    print just_b_edges
-    # TODO: Fix telomeres
-    # TODO: Make set out of list.
-    for first, second, color in just_a_edges:
-        intermediate_adjacencies.append('%s%s' % (first, second))
-    for first, second, color in just_b_edges:
-        intermediate_adjacencies.append('%s%s' % (first, second))
-
-    print intermediate_adjacencies
+    print set(intermediate_adjacencies)
