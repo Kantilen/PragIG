@@ -31,15 +31,14 @@ def perform_DCJ(graph):
                 continue
             if first.startswith('Telo') and second.startswith('Telo'):
                 continue
-            intermediate_adjacencies.add('%s%s' % (first, second))
+            if not '%s%s' % (second, first) in intermediate_adjacencies:
+                intermediate_adjacencies.add('%s%s' % (first, second))
 
         if len(all_edges) == 2:
             continue
 
         just_a_edges = [x for x in all_edges if x[2]['color'] == 'A']
 
-
-        #TODO: Telomere fix again - and make this elegant...
         while just_a_edges:
             p,q,color_current = just_a_edges.pop()
             for r,s,color in just_a_edges:
