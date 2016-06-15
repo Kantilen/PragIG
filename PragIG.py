@@ -11,6 +11,7 @@ import networkx as nx
 
 import adjacency_creation
 import build_cBP
+import find_intermediate_adjacencies
 #################################
 
 
@@ -52,5 +53,7 @@ if not same_content[0]:
 # Create adjacency sets of the two genomes
 adjacency_setA = adjacency_creation.create_adjacency_set(arguments.genomeA)
 adjacency_setB = adjacency_creation.create_adjacency_set(arguments.genomeB)
+
 # Create the circular breakpoint graph of the two genomes
 circular_breakpoint = build_cBP.connect_adjacencies(adjacency_setA, adjacency_setB)
+intermediate_adj = find_intermediate_adjacencies.perform_DCJ(circular_breakpoint)
