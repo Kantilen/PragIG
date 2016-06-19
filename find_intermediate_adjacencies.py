@@ -15,7 +15,11 @@ intermediate_adjacencies = set()
 #################################
 
 def perform_DCJ(graph):
-
+    '''
+    Obsolete function! But it does the right thing, therefore I am able to implement good stuff....
+    :param graph:
+    :return:
+    '''
     components = [x for x in nx.connected_component_subgraphs(graph)]
 
     for component in components:
@@ -60,19 +64,29 @@ def perform_DCJ(graph):
     return intermediate_adjacencies
 
 def get_all_inter_adj(graph):
+    '''
+    This function enumerates all vertices and finds the intermediate adjacencies.
+    :param graph: circular breakpoint graph
+    :return: set of all intermediate adjacenices
+    '''
+
+    # each component can be solved seperately
     for component in nx.connected_component_subgraphs(graph):
-        if len(component.nodes()) == 2:
+        if len(component.nodes()) == 2: # cycles of length 2 are fixed!
             continue
 
         enumerated_vertices = {}
 
+        # assign value for each vertex from 1 to (n+1)
         for index, vertex in enumerate(component.nodes()):
             enumerated_vertices[vertex] = index+1
 
+        # This is tricky. two vertices whose difference are odd form an intermediate adjacency.
+        # I have to ask Pedro for the theoretical background here.
         odd_adjacencies = [(x,y) for x in enumerated_vertices.keys() for y in enumerated_vertices.keys()
                       if (abs(enumerated_vertices[x] - enumerated_vertices[y]) % 2 == 1)]
 
-
+        # This for loops kicks the artifical telomeres.
         for first,second in odd_adjacencies:
             if first.startswith('Telo'):
                 intermediate_adjacencies.add(second)
@@ -82,10 +96,16 @@ def get_all_inter_adj(graph):
                 continue
             if first.startswith('Telo') and second.startswith('Telo'):
                 continue
+            # some nasty set issue. Since we are dealing with strings, there is a difference
+            # between 1h2t and 2t1h. We might change this at some point.
             if not '%s%s' % (second,first) in intermediate_adjacencies:
                 intermediate_adjacencies.add('%s%s' % (first,second))
-    #return intermediate_adjacencies
 
 def find_all_adjacencies(graph):
+    '''
+    Wrapping function that is called by the mainflow script
+    :param graph: circular breakpoint graph
+    :return: set of all intermediate adjacencies.
+    '''
     get_all_inter_adj(graph)
     return intermediate_adjacencies
