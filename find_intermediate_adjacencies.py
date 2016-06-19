@@ -88,13 +88,13 @@ def get_all_inter_adj(graph):
 
         # This for loops kicks the artifical telomeres.
         for first,second in odd_adjacencies:
+            if first.startswith('Telo') and second.startswith('Telo'):
+                continue
             if first.startswith('Telo'):
                 intermediate_adjacencies.add(second)
                 continue
             if second.startswith('Telo'):
                 intermediate_adjacencies.add(first)
-                continue
-            if first.startswith('Telo') and second.startswith('Telo'):
                 continue
             # some nasty set issue. Since we are dealing with strings, there is a difference
             # between 1h2t and 2t1h. We might change this at some point.

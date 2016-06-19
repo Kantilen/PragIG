@@ -27,11 +27,15 @@ def validate_input(first_genome, second_genome):
     '''
 
     # remove signs and chromosomes
-    first_genome = set(re.sub('[-)|]', '', first_genome))
-    second_genome = set(re.sub('[-)|]', '', second_genome))
+    first_genome = re.sub('[-)|]', '', first_genome)
+    second_genome = re.sub('[-)|]', '', second_genome)
+    first_genome = re.sub('  ', ' ', first_genome)
+    second_genome = re.sub('  ', ' ', second_genome)
 
     # symmetrical difference. Just take elements that are unique in one
     # of the sets
+    first_genome = set([x for x in first_genome.split(" ")])
+    second_genome = set([x for x in second_genome.split(" ")])
     difference = first_genome ^ second_genome
 
     return (len(difference) == 0, difference)
