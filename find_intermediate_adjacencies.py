@@ -17,7 +17,6 @@ intermediate_adjacencies = set()
 def perform_DCJ(graph):
 
     components = [x for x in nx.connected_component_subgraphs(graph)]
-    #number_of_cycles = len(components)
 
     for component in components:
         all_edges = component.edges(data=True)
@@ -58,8 +57,35 @@ def perform_DCJ(graph):
                 new_graph.add_edge(q, r, color='A')
                 if len([x for x in nx.connected_components(new_graph)]) > 1:
                     perform_DCJ(new_graph)
+    return intermediate_adjacencies
 
+def get_all_inter_adj(graph):
+    for component in nx.connected_component_subgraphs(graph):
+        if len(component.nodes()) == 2:
+            continue
+
+        enumerated_vertices = {}
+
+        for index, vertex in enumerate(component.nodes()):
+            enumerated_vertices[vertex] = index+1
+
+        odd_adjacencies = [(x,y) for x in enumerated_vertices.keys() for y in enumerated_vertices.keys()
+                      if (abs(enumerated_vertices[x] - enumerated_vertices[y]) % 2 == 1)]
+
+
+        for first,second in odd_adjacencies:
+            if first.startswith('Telo'):
+                intermediate_adjacencies.add(second)
+                continue
+            if second.startswith('Telo'):
+                intermediate_adjacencies.add(first)
+                continue
+            if first.startswith('Telo') and second.startswith('Telo'):
+                continue
+            if not '%s%s' % (second,first) in intermediate_adjacencies:
+                intermediate_adjacencies.add('%s%s' % (first,second))
+    #return intermediate_adjacencies
 
 def find_all_adjacencies(graph):
-    perform_DCJ(graph)
+    get_all_inter_adj(graph)
     return intermediate_adjacencies
