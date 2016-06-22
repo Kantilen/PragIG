@@ -72,8 +72,8 @@ def get_all_inter_adj(graph):
 
     # each component can be solved seperately
     for component in nx.connected_component_subgraphs(graph):
-        if len(component.nodes()) == 2: # cycles of length 2 are fixed!
-            continue
+        #if len(component.nodes()) == 2: # cycles of length 2 are fixed!
+        #    continue
 
         enumerated_vertices = {}
 
@@ -85,7 +85,7 @@ def get_all_inter_adj(graph):
         # I have to ask Pedro for the theoretical background here.
         odd_adjacencies = [(x,y) for x in enumerated_vertices.keys() for y in enumerated_vertices.keys()
                       if (abs(enumerated_vertices[x] - enumerated_vertices[y]) % 2 == 1)]
-
+        #print odd_adjacencies
         # This for loops kicks the artifical telomeres.
         for first,second in odd_adjacencies:
             if first.startswith('Telo') and second.startswith('Telo'):
