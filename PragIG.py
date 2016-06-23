@@ -64,5 +64,7 @@ adjacency_setB = adjacency_creation.create_adjacency_set(arguments.genomeB)
 circular_breakpoint = build_cBP.connect_adjacencies(adjacency_setA, adjacency_setB)
 intermediate_adj = find_intermediate_adjacencies.find_all_adjacencies(circular_breakpoint)
 
-print intermediate_adj, len(intermediate_adj)
-#print binary_vector.create_vector_for_genome(adjacency_setA, intermediate_adj)
+#print intermediate_adj, len(intermediate_adj)
+print binary_vector.create_vector_for_genome(adjacency_setA, intermediate_adj)
+print binary_vector.create_vector_for_genome(adjacency_setB, intermediate_adj)
+print intermediate_adj

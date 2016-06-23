@@ -83,7 +83,6 @@ def get_all_inter_adj(graph):
         for index, vertex in enumerate(long_path):
             enumerated_vertices[vertex] = index+1
 
-
         # This is tricky. two vertices whose difference are odd form an intermediate adjacency.
         # I have to ask Pedro for the theoretical background here.
         odd_adjacencies = [(x,y) for x in enumerated_vertices.keys() for y in enumerated_vertices.keys()
