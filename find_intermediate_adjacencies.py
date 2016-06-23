@@ -81,6 +81,8 @@ def get_all_inter_adj(graph):
         for index, vertex in enumerate(component.nodes()):
             enumerated_vertices[vertex] = index+1
 
+        #print component.adjacency_list()
+
         # This is tricky. two vertices whose difference are odd form an intermediate adjacency.
         # I have to ask Pedro for the theoretical background here.
         odd_adjacencies = [(x,y) for x in enumerated_vertices.keys() for y in enumerated_vertices.keys()
@@ -107,5 +109,6 @@ def find_all_adjacencies(graph):
     :param graph: circular breakpoint graph
     :return: set of all intermediate adjacencies.
     '''
+    #perform_DCJ(graph)
     get_all_inter_adj(graph)
     return intermediate_adjacencies

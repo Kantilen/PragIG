@@ -64,9 +64,11 @@ def create_circular_graph():
                 continue
 
             if adjacencies_b[key]: # If the extremity is no telomere in the other genome
-                G.add_edge(key, adjacencies_b[key], color='B') # connect it with B-edge
+                if not G.get_edge_data(key, adjacencies_b[key]):
+                    G.add_edge(key, adjacencies_b[key], color='B') # connect it with B-edge
             if adjacencies_b[value]: # If neighbor of current extremity is no telomere in other genome
-                G.add_edge(value, adjacencies_b[value], color='B') # connect it with B-edge
+                if not G.get_edge_data(value,adjacencies_b[value]):
+                    G.add_edge(value, adjacencies_b[value], color='B') # connect it with B-edge
 
     # This part is to create the CIRCULAR breakpoint graph
     components = [x for x in nx.connected_component_subgraphs(G)] # get all components in a list
