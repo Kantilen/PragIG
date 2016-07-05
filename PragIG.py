@@ -27,15 +27,13 @@ def validate_input(first_genome, second_genome):
     '''
 
     # remove signs and chromosomes
-    first_genome = re.sub('[-)|]', '', first_genome)
-    second_genome = re.sub('[-)|]', '', second_genome)
-    first_genome = re.sub('  ', ' ', first_genome)
-    second_genome = re.sub('  ', ' ', second_genome)
+    first_genome = [re.sub('-','',x) for x in first_genome]
+    second_genome = [re.sub('-', '', x) for x in second_genome]
 
     # symmetrical difference. Just take elements that are unique in one
     # of the sets
-    first_genome = set([x for x in first_genome.split(" ")])
-    second_genome = set([x for x in second_genome.split(" ")])
+    first_genome = set(first_genome)
+    second_genome = set(second_genome)
     difference = first_genome ^ second_genome
 
     return (len(difference) == 0, difference)
@@ -53,24 +51,32 @@ arguments = parser.parse_args()
 
 input = Input(arguments.G, arguments.T)
 
-print input.tree
+pairwise_genomes = []
 
+for clade in input.tree.find_clades():
+    if clade.count_terminals() == 2:
+        leaves = clade.find_clades()
+        leaves = [x.name for x in leaves if x.name]
+        pairwise_genomes.append(leaves)
 
-#same_content = validate_input(arguments.genomeA, arguments.genomeB)
-#if not same_content[0]:
-#    print >> sys.stderr, "Content of the genomes is not equal. Check your input!"
-#    print >> sys.stderr, " ".join(["%s" % x for x in same_content[1]])
-#    sys.exit(1)
+for pair in pairwise_genomes:
+    first = input.genomes[pair[0]]
+    second = input.genomes[pair[1]]
 
-# Create adjacency sets of the two genomes
-#adjacency_setA = adjacency_creation.create_adjacency_set(arguments.genomeA)
-#adjacency_setB = adjacency_creation.create_adjacency_set(arguments.genomeB)
+    same_content = validate_input(first, second)
+    if not same_content[0]:
+        print >> sys.stderr, "Content of the genomes is not equal. Check your input!"
+        print >> sys.stderr, " ".join(["%s" % x for x in same_content[1]])
+        sys.exit(1)
 
+    # Create adjacency sets of the two genomes
+    adjacency_setA = adjacency_creation.create_adjacency_set(first)
+    adjacency_setB = adjacency_creation.create_adjacency_set(second)
 
-# Create the circular breakpoint graph of the two genomes
-#circular_breakpoint = build_cBP.connect_adjacencies(adjacency_setA, adjacency_setB)
-#intermediate_adj = find_intermediate_adjacencies.find_all_adjacencies(circular_breakpoint)
+    # Create the circular breakpoint graph of the two genomes
+    circular_breakpoint = build_cBP.connect_adjacencies(adjacency_setA, adjacency_setB)
+    intermediate_adj = find_intermediate_adjacencies.find_all_adjacencies(circular_breakpoint)
 
-#print intermediate_adj, len(intermediate_adj)
-#bin_vector_A = binary_vector.create_vector_for_genome(adjacency_setA, intermediate_adj)
-#bin_vector_B = binary_vector.create_vector_for_genome(adjacency_setB, intermediate_adj)
+    print len(intermediate_adj)
+    bin_vector_A = binary_vector.create_vector_for_genome(adjacency_setA, intermediate_adj)
+    bin_vector_B = binary_vector.create_vector_for_genome(adjacency_setB, intermediate_adj)

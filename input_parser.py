@@ -3,9 +3,9 @@
 #################################
 # Import section                #
 #################################
-import argparse as args
 import sys
 import os
+from Bio import Phylo
 #################################
 
 __author__ = 'klamkiewicz'
@@ -28,15 +28,7 @@ class Input:
 
 
     def read_tree(self,tree):
-
-        num_lines = sum(1 for line in open(tree))
-        if num_lines != 1:
-            print "Error: Your tree file has more than one line.\nExiting..."
-            sys.exit(1)
-
-        with open(tree, 'r') as tree_content:
-            newick_tree = tree_content.readline().rstrip("\n")
-        return newick_tree
+        return Phylo.read(tree, 'newick')
 
 
     def read_genomes(self, genomes):
@@ -47,7 +39,7 @@ class Input:
             while 1:
                 current_genome = gene_content.readline()
                 if not current_genome:
-                    value.append(')')
+                    #value.append(')')
                     genome_content.update({key:value})
                     break
 
@@ -61,19 +53,9 @@ class Input:
                     if not key:
                         key = current_genome.strip('\n>')
                         continue
-                    value.append(')')
+                    #value.append(')')
                     genome_content.update({key:value})
                     key = current_genome.strip('\n>')
                     value = []
 
         return genome_content
-
-
-
-    #def read_input(self, genomes, tree):
-
-
-    #    newick_tree = read_tree(tree)
-    #    genome_content = read_genomes(genomes)
-
-    #    return genome_content, newick_tree

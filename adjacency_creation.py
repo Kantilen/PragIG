@@ -20,7 +20,8 @@ def create_adjacency_set(genome_content):
 
     # some preprocessing. Force spaces at chromosome characters
     #TODO: Auslagern - den Kram brauch ich oefter, nicht nur hier
-    genome_content = re.split('\s+' ,genome_content.replace('|', ' | ').replace(')', ' ) ').strip())
+
+    #genome_content = re.split('\s+' ,genome_content.replace('|', ' | ').replace(')', ' ) ').strip())
 
     # if not sign is given, linear chromosomes are default
     if not (genome_content[-1] == ')' or genome_content[-1] == '|'):
