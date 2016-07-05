@@ -7,7 +7,7 @@ import argparse as args
 import re
 import sys
 
-import input_parser
+from input_parser import Input
 import adjacency_creation
 import build_cBP
 import find_intermediate_adjacencies
@@ -51,9 +51,9 @@ parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that c
 
 arguments = parser.parse_args()
 
-input_reading = input_parser.read_input(arguments.G, arguments.T)
+input = Input(arguments.G, arguments.T)
 
-print input_reading
+print input.tree
 
 
 #same_content = validate_input(arguments.genomeA, arguments.genomeB)
