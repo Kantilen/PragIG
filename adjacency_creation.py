@@ -32,7 +32,7 @@ class Adjacency_Set():
         for index, gene in enumerate(genome_content):
             if not (re.match('[\d*\w*]+', gene)  or gene.startswith('-') ): # chromosome sign detected
 
-                # the first and last extremity have to be considered separately
+                # the first_content and last extremity have to be considered separately
                 first = current_chromosome[0]
                 last = current_chromosome[-1]
                 current_chromosome.remove(first)

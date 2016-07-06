@@ -13,16 +13,13 @@ __author__ = 'klamkiewicz'
 
 class Inter_Adjacencies():
 
-    def __init__(self, adjA, adjB):
+    def __init__(self, graph):
 
-        self.adjA = adjA
-        self.adjB = adjB
-        self.adjacencies_a = {}
-        self.adjacencies_b = {}
-        self.colors = {'A' : 'B',
-                        'B' : 'A'}
+        #self.adjA = adjA
+        #self.adjB = adjB
 
-        self.graph = self.connect_adjacencies(self.adjA, self.adjB)
+
+        self.graph = graph
         self.intermediate_adjacencies = set()
         self.get_all_inter_adj(self.graph)
         #print self.intermediate_adjacencies
@@ -65,12 +62,25 @@ class Inter_Adjacencies():
                 if not '%s%s' % (second,first) in self.intermediate_adjacencies:
                     self.intermediate_adjacencies.add('%s%s' % (first,second))
 
+class Circular_Breakpoint():
+
+    def __init__(self, adjA, adjB):
+        self.adjA = adjA
+        self.adjB = adjB
+
+        self.adjacencies_a = {}
+        self.adjacencies_b = {}
+        self.colors = {'A': 'B',
+                       'B': 'A'}
+
+        self.graph = self.connect_adjacencies(self.adjA, self.adjB)
+
     def connect_adjacencies(self, adjA, adjB):
         '''
         From a given adjacency set the single extremities are created and stored into dicts.
         Each extremity points to its adjacency (or None, if it is a telomere)
-        :param adjA: Adjacency Set of the first genome
-        :param adjB: Adjacency Set of the second genome
+        :param adjA: Adjacency Set of the first_content genome
+        :param adjB: Adjacency Set of the second_content genome
         :return: Returns the value of create_circular_graph()
         '''
         wrapper = [(adjA, self.adjacencies_a), (adjB, self.adjacencies_b)]

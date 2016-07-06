@@ -59,3 +59,13 @@ class Input:
                     value = []
 
         return genome_content
+
+    def find_pairwise_leaves(self, tree):
+        pairwise_genomes = []
+
+        for clade in tree.find_clades():
+            if clade.count_terminals() == 2:
+                leaves = clade.find_clades()
+                leaves = [x.name for x in leaves if x.name]
+                pairwise_genomes.append(leaves)
+        return pairwise_genomes

@@ -22,8 +22,8 @@ def connect_adjacencies(adjA, adjB):
     '''
     From a given adjacency set the single extremities are created and stored into dicts.
     Each extremity points to its adjacency (or None, if it is a telomere)
-    :param adjA: Adjacency Set of the first genome
-    :param adjB: Adjacency Set of the second genome
+    :param adjA: Adjacency Set of the first_content genome
+    :param adjB: Adjacency Set of the second_content genome
     :return: Returns the value of create_circular_graph()
     '''
     wrapper = [(adjA, adjacencies_a), (adjB, adjacencies_b)]
