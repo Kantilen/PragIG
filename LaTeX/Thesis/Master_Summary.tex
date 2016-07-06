@@ -1,0 +1,43 @@
+\chapter{Summary}
+Evolutionary biologists are trying to reconstruct genomes of extinct ancestral species.
+All genetic information is subject to continuous changes called mutations.
+Mutations are not only made up at the level of base-pair changes but also by rearrangement events such as inversions,
+translocations, fusions and fissions~\cite{Kent30092003}.
+\\ \ \\
+In order to model these events, a notation from previous work is used~\cite{Bergeron2006}.
+Let $g$ be a conserved region (\emph{gene}) in a genome.
+Each gene has two extremities, the tail ($g^t$) and the head ($g^h$).
+We write $g$ ($-g$) if along the chromosome the tail of $g$ comes before (after) its head.
+Two adjacent extremities of two consecutive genes form an \emph{adjacency}.
+Considering linear chromosomes, an extremity without an adjacent extremity is called \emph{telomere}.
+One rearrangement model that considers the most common rearrangement events is the \emph{\gls{dcj}} model~\cite{Yancopoulos15082005}.
+\\ \ \\
+In order to reconstruct ancestral gene orders, internal nodes of a given phylogenetic tree, with extant genomes at the leaves, have to be labeled
+with the ancestral genomes in a way such that the cost of the resulting tree is minimized.
+This is also known as the \emph{\gls{spp}}. 
+Over the past few years, different methods to reconstruct ancestral gene orders have been proposed.
+These methods can be divided into two groups: event-based methods and homology-based methods.
+Event-based methods use rearrangement models and scenarios to reconstruct the ancestral genome.\\
+Transforming one genome into another with the help of rearrangements is also called \emph{sorting}.
+Every series of rearrangement operations that transforms genome $A$ into $B$ is a \emph{valid sorting scenario}.
+However, it has been shown that the solution space of sorting with \gls{dcj} grows exponentially with the distance of the genomes to be sorted~\cite{Stoye2010}.
+Furthermore, solving the \gls{spp} under the \gls{dcj} model is NP-hard~\cite{Tannier2009}.
+\\ \ \\
+Recently Feijão~\cite{Feijao2015} proposed a new heuristic that solves the \gls{spp} under \gls{dcj}.
+For that, he used the \emph{\gls{cbp}} that visualizes the rearrangement events between two genomes $A$ and $B$.
+Using the \gls{dcj} model in order to calculate optimal sorting scenarios exploits the advantage of the \gls{cbp}
+where every component of the graph is a cycle.
+The goal in that work is to find intermediate genomes of two genomes $A$ and $B$ that arise in optimal sorting scenarios.
+Labeling the internal nodes of the phylogenetic tree with intermediate genomes improves the ancestral reconstruction results, even though the tree itself
+might not be the most parsimonious one~\cite{Feijao2015}.
+\\ \ \\
+\todo{Dieser Abschnitt muss zum Schluss neu geschrieben werden!}\\
+\todo{Kurzen Absatz über die Aufteilung der Masterarbeit}
+In the scope of my master thesis I want to extend the method of Feijão by a probabilistic approach.
+This approach considers the probability of an adjacency being affected by a rearrangement.
+Similar approaches have been proposed for event-based methods already~\cite{Ma2006,Yang2014,Hu2013}, however the framework of Feijão is able to 
+add information about homology. 
+With this information, we think we are able to improve the probabilistic approaches.\\
+Another point I would like to study is the positional constraint of genes.
+Swenson and Blanchette~\cite{Swenson2015} showed how to color adjacency graphs considering the position of genes \emph{in vivo}.
+These positional constraints could improve the probability approach even further.
