@@ -8,8 +8,9 @@ import re
 import sys
 
 from input_parser import Input
-import adjacency_creation
+from adjacency_creation import Adjacency_Set
 import build_cBP
+#from find_intermediate_adjacencies import Inter_Adjacencies
 import find_intermediate_adjacencies
 import binary_vector
 #################################
@@ -39,18 +40,13 @@ def validate_input(first_genome, second_genome):
     return (len(difference) == 0, difference)
 
 # Commandline arguments
-# TODO: This will be done via file reading soon...
 parser = args.ArgumentParser(description="Enter two genomes in the input format of Unimog")
-#parser.add_argument('genomeA', metavar='genomeA', type=str, help="Sequence of the first genome")
-#parser.add_argument('genomeB', metavar='genomeB', type=str, help="Sequence of the second genome")
 parser.add_argument('G', metavar='GENOMES', type=str, help="Path to the file that contains the information of extant genomes")
 parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that contains the NEWICK tree")
-
 
 arguments = parser.parse_args()
 
 input = Input(arguments.G, arguments.T)
-
 pairwise_genomes = []
 
 for clade in input.tree.find_clades():
@@ -70,13 +66,14 @@ for pair in pairwise_genomes:
         sys.exit(1)
 
     # Create adjacency sets of the two genomes
-    adjacency_setA = adjacency_creation.create_adjacency_set(first)
-    adjacency_setB = adjacency_creation.create_adjacency_set(second)
+    adjacency_setA = Adjacency_Set(first)
+    adjacency_setB = Adjacency_Set(second)
 
     # Create the circular breakpoint graph of the two genomes
-    circular_breakpoint = build_cBP.connect_adjacencies(adjacency_setA, adjacency_setB)
+    #circular_breakpoint = Inter_Adjacencies(adjacency_setA.adjacencies, adjacency_setB.adjacencies)
+    circular_breakpoint = build_cBP.connect_adjacencies(adjacency_setA.adjacencies, adjacency_setB.adjacencies)
     intermediate_adj = find_intermediate_adjacencies.find_all_adjacencies(circular_breakpoint)
 
     print len(intermediate_adj)
-    bin_vector_A = binary_vector.create_vector_for_genome(adjacency_setA, intermediate_adj)
-    bin_vector_B = binary_vector.create_vector_for_genome(adjacency_setB, intermediate_adj)
+    #bin_vector_A = binary_vector.create_vector_for_genome(adjacency_setA.adjacencies, intermediate_adj)
+    #bin_vector_B = binary_vector.create_vector_for_genome(adjacency_setB.adjacencies, intermediate_adj)
