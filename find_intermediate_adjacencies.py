@@ -87,7 +87,7 @@ def get_all_inter_adj(graph):
         # I have to ask Pedro for the theoretical background here.
         odd_adjacencies = [(x,y) for x in enumerated_vertices.keys() for y in enumerated_vertices.keys()
                       if (abs(enumerated_vertices[x] - enumerated_vertices[y]) % 2 == 1)]
-        #print odd_adjacencies
+
         # This for loops kicks the artifical telomeres.
         for first,second in odd_adjacencies:
             if first.startswith('Telo') and second.startswith('Telo'):
@@ -111,4 +111,5 @@ def find_all_adjacencies(graph):
     '''
     #perform_DCJ(graph)
     get_all_inter_adj(graph)
+    #print intermediate_adjacencies
     return intermediate_adjacencies

@@ -25,6 +25,7 @@ class Inter_Adjacencies():
         self.graph = self.connect_adjacencies(self.adjA, self.adjB)
         self.intermediate_adjacencies = set()
         self.get_all_inter_adj(self.graph)
+        #print self.intermediate_adjacencies
 
     def get_all_inter_adj(self, graph):
         '''
@@ -48,7 +49,7 @@ class Inter_Adjacencies():
             # I have to ask Pedro for the theoretical background here.
             odd_adjacencies = [(x,y) for x in enumerated_vertices.keys() for y in enumerated_vertices.keys()
                           if (abs(enumerated_vertices[x] - enumerated_vertices[y]) % 2 == 1)]
-            #print odd_adjacencies
+
             # This for loops kicks the artifical telomeres.
             for first,second in odd_adjacencies:
                 if first.startswith('Telo') and second.startswith('Telo'):

@@ -6,11 +6,12 @@
 import argparse as args
 import re
 import sys
+import networkx as nx
 
 from input_parser import Input
 from adjacency_creation import Adjacency_Set
 import build_cBP
-#from find_intermediate_adjacencies import Inter_Adjacencies
+from find_intermediate_adjacencies_class import Inter_Adjacencies
 import find_intermediate_adjacencies
 import binary_vector
 #################################
@@ -70,10 +71,15 @@ for pair in pairwise_genomes:
     adjacency_setB = Adjacency_Set(second)
 
     # Create the circular breakpoint graph of the two genomes
-    #circular_breakpoint = Inter_Adjacencies(adjacency_setA.adjacencies, adjacency_setB.adjacencies)
-    circular_breakpoint = build_cBP.connect_adjacencies(adjacency_setA.adjacencies, adjacency_setB.adjacencies)
-    intermediate_adj = find_intermediate_adjacencies.find_all_adjacencies(circular_breakpoint)
+    #circular_breakpoint = build_cBP.connect_adjacencies(adjacency_setA.adjacencies, adjacency_setB.adjacencies)
+    #intermediate_adj = find_intermediate_adjacencies.find_all_adjacencies(circular_breakpoint)
 
-    print len(intermediate_adj)
+    all_inter_genomes = Inter_Adjacencies(adjacency_setA.adjacencies, adjacency_setB.adjacencies)
+    print len(all_inter_genomes.intermediate_adjacencies)
+
+
+
+
+
     #bin_vector_A = binary_vector.create_vector_for_genome(adjacency_setA.adjacencies, intermediate_adj)
     #bin_vector_B = binary_vector.create_vector_for_genome(adjacency_setB.adjacencies, intermediate_adj)
