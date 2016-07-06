@@ -44,11 +44,15 @@ parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that c
 
 arguments = parser.parse_args()
 
+# Genome content and tree file are read
 input = Input(arguments.G, arguments.T)
+# Get all pairwise 'siblings' in the tree
 pairwise_genomes = input.find_pairwise_leaves(input.tree)
 
 potential_ancestors = {}
 
+# main iteration
+#TODO: Do a while-loop, pop the first element and update the list with the next (resolved) level in the tree.
 for pair in pairwise_genomes:
     first_content = input.genomes[pair[0]]
     second_content = input.genomes[pair[1]]

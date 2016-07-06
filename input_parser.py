@@ -12,9 +12,18 @@ __author__ = 'klamkiewicz'
 
 
 class Input:
-
+    '''
+    We use this class for reading and parsing the input files. There is also a method that
+    returns all genomes that are leaves and children of the same ancestor. Each pair of such genomes are
+    returned in a list.
+    DEPENDENCY: BioPython
+    '''
     def __init__(self, genomes, tree):
-
+        '''
+        Validation of file paths and reading of the content
+        :param genomes: Path to the genome content file
+        :param tree: Path to NEWICK tree
+        '''
         if not (os.path.isfile(genomes)):
             print >> sys.stderr, "Error: Couldn't find genome file. Check your input.\n%s" % (genomes)
             sys.exit(1)
@@ -28,10 +37,21 @@ class Input:
 
 
     def read_tree(self,tree):
+        '''
+        Reads the NEWICK tree! DEPENDENCY: BioPython
+        :param tree: Path to the NEWICK tree
+        :return: Some BioPython Object containing information of the tree.
+        '''
         return Phylo.read(tree, 'newick')
 
 
     def read_genomes(self, genomes):
+        '''
+        This function reads the genome content. At the moment the input has to look like
+        Pedros simulation in the /prj/genomesimul/ig_indel* folders.
+        :param genomes: Path to the genome content file
+        :return: dictionary of the genome name as key and content as value
+        '''
         genome_content = {}
         with open(genomes,'r') as gene_content:
             value = []
@@ -61,6 +81,11 @@ class Input:
         return genome_content
 
     def find_pairwise_leaves(self, tree):
+        '''
+        Traverses a given tree and returns all pairwise genomes (same ancestor) as a list.
+        :param tree:
+        :return:
+        '''
         pairwise_genomes = []
 
         for clade in tree.find_clades():

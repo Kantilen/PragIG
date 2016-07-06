@@ -10,15 +10,21 @@ __author__ = 'klamkiewicz'
 
 
 class Adjacency_Set():
-
+    '''
+    This class contains methods to create the adjacency set of a given genome.
+    '''
     def __init__(self, genome_content):
+        '''
+        Just some initialization.
+        :param genome_content: list of genes
+        '''
         self.adjacencies = self.create_adjacency_set(genome_content)
 
     def create_adjacency_set(self, genome_content):
         '''
         This function reads the genome content and creates the adjacency set of it.
         Note that the genome should be represented in the UniMog input notation.
-        :param genome_content: UniMog representation of the genome. Type=String
+        :param genome_content: UniMog representation of the genome. Type=List
         :return: Adjacency set of the genome. Type=List (of strings)
         '''
         adjacencies = [] # returned value

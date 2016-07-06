@@ -9,20 +9,20 @@ import re
 
 __author__ = 'klamkiewicz'
 
-
-
 class Inter_Adjacencies():
-
+    '''
+    Given a (networkx) graph, this class creates the set of ALL intermediate adjacencies
+    that arise between to genomes represented by the circular breakpoint graph.
+    DEPENDENCY: networkx
+    '''
     def __init__(self, graph):
-
-        #self.adjA = adjA
-        #self.adjB = adjB
-
-
+        '''
+        Initialization. Also calls the method to create the intermediate-adjacency set
+        :param graph: circular breakpoint graph
+        '''
         self.graph = graph
         self.intermediate_adjacencies = set()
         self.get_all_inter_adj(self.graph)
-        #print self.intermediate_adjacencies
 
     def get_all_inter_adj(self, graph):
         '''
@@ -30,7 +30,6 @@ class Inter_Adjacencies():
         :param graph: circular breakpoint graph
         :return: set of all intermediate adjacencies
         '''
-
         # each component can be solved seperately
         for component in nx.connected_component_subgraphs(graph):
 
@@ -63,13 +62,24 @@ class Inter_Adjacencies():
                     self.intermediate_adjacencies.add('%s%s' % (first,second))
 
 class Circular_Breakpoint():
-
+    '''
+    This class creates the circular breakpoint of to given genomes.
+    Note that you have to input the adjacency sets and not the genomes themselves.
+    DEPENDENCY: networkx
+    '''
     def __init__(self, adjA, adjB):
+        '''
+        Initialization. Also calls the method to create the circular breakpoint graph
+        :param adjA: list of adjacencies of the first genome
+        :param adjB: list of adjacencies of the second genome
+        '''
         self.adjA = adjA
         self.adjB = adjB
 
         self.adjacencies_a = {}
         self.adjacencies_b = {}
+
+        # This dictionary is used to create "fictional" edges between two added telomeres
         self.colors = {'A': 'B',
                        'B': 'A'}
 
