@@ -1,0 +1,8 @@
+This is makeindex, version 2.15 [TeX Live 2013] (kpathsea + Thai support).
+Scanning style file ./Master_Thesis.ist.............................done (29 attributes redefined, 0 ignored).
+Scanning input file Master_Thesis.acn...
+!! Input index error (file = Master_Thesis.acn, line = 1):
+   -- Unknown index keyword (indexentry:tkey(("HTS""\\glossentry.
+done (0 entries accepted, 1 rejected).
+Nothing written in Master_Thesis.acr.
+Transcript written in Master_Thesis.ilg.
