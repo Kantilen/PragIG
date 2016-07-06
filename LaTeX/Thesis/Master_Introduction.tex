@@ -1,6 +1,12 @@
 \chapter{Introduction}
 
-
+The discovery of the role of \gls{dna} in terms of heredity in 1952 lead to the question how to read the information encoded in the \gls{dna}.
+With the knowledge about the molecular structure of the \gls{dna} it is clear that genes and their regulatory elements are present on two 
+reverse-complementary \gls{dna}-strands, where Adenine (\textbf{A}) pairs with Thymine (\textbf{T}) and Cytosine (\textbf{C}) 
+pairs with Guanine (\textbf{G}) respectively.
+However, the methodology of \emph{sequencing} was not proposed until the mid 1970's.
+Combined with the decryption of the genetic code it is possible to predict \emph{genes} and other regions of interest using sequenced genome sequences.
+Especially with the advance of the \emph{\gls{hts}} technology  
 
 \section{Modeling genomes} % (fold)
 \label{sub:modeling_genomes}
@@ -10,14 +16,13 @@ A chromosome is represented by a sequences of genes.
 If the chromosome is \emph{linear} it is flanked by \emph{telomeres} ($\circ$).
 A genome $G$ is the set of its chromosome.
 A gene $g$ from $G$ has two extremeties, the tail ($g^t$) and the head ($g^h$).
-Since genes can be located both DNA strands, we encode this by a leading $-$, i.e. $g$ is located on the leading strand and $-h$ on the lagging strand.
+We denote $-g$ if the head of a gene $g$ comes before the tail of the gene, otherwise we simply write $g$.
 It is possible to describe \emph{adjacencies} between two genes $g$ and $h$. 
 If $g$ and $h$ are two consecutive genes in the genome $G$, we can describe their adjacency by their adjacent gene extremeties.
 Note that there exist four different ways of orientation for two genes.
-Gene extremeties that are located on the end of a linear chromosome are often combined with the telomere, thus forming a \todo{Rausstreichen} \emph{telomeric adjacency}. 
-In order to describe a genome $G$ it is possible to use the set of chromosomes or the set of adjacencies $A$.\\
+In order to describe a genome $G$ it is possible to use the set of chromosomes or the set of adjacencies $\mathcal{G}$.\\
 The genome $G_A$ in Figure~\ref{fig:genomeRep} has two linear chromosomes with five genes, where $G_A=\{(\circ\ 1\ -2\ 3\ \circ),(\circ\ 4\ 5\ \circ)\}$
-and $A=\{\circ 1^t, 1^h2^h, 2^t3^t, 3^h\circ, \circ 4^t, 4^h5^t, 5^h\circ\}$\\ \ \\
+and $\mathcal{G}_A=\{\circ 1^t, 1^h2^h, 2^t3^t, 3^h\circ, \circ 4^t, 4^h5^t, 5^h\circ\}$\\ \ \\
 
 \begin{figure}[h]
 	\centering
