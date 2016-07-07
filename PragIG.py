@@ -38,12 +38,12 @@ for pair in pairwise_genomes:
     inter_info = Intermediate_Genome(first_content, second_content)
 
     # check if content of genomes is identical.
-    isValid = inter_info.validate_input()
+    is_valid = inter_info.validate_input()
 
     # if not, quit the process
-    if not isValid[0]:
+    if not is_valid[0]:
         print >> sys.stderr, "Content of the genomes is not equal. Check your input!"
-        print >> sys.stderr, " ".join(["%s" % x for x in same_content[1]])
+        print >> sys.stderr, " ".join(["%s" % x for x in is_valid[1]])
         sys.exit(1)
 
     # Adjacency sets are created

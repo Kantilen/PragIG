@@ -219,9 +219,8 @@ class Intermediate_Genome():
 
             first_adj = component.edges()[0]
             long_path = [x for x in nx.all_simple_paths(component, first_adj[0], first_adj[1])][-1]
-            # assign value for each vertex from 1 to (n+1)
+            # assign value for each vertex from 0 to n
             for index, vertex in enumerate(long_path):
-                #enumerated_vertices[vertex] = index + 1
                 enumerated_vertices[index] = vertex
             # This is tricky. two vertices whose difference are odd form an intermediate adjacency.
             # I have to ask Pedro for the theoretical background here.
