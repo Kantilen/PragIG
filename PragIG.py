@@ -8,9 +8,8 @@ import re
 import sys
 
 from input_parser import Input
-from adjacency_creation import Adjacency_Set
-from inter_adjacency_cBP import Circular_Breakpoint
-from inter_adjacency_cBP import Inter_Adjacencies
+from Intermediate_Genome import Intermediate_Genome
+
 #################################
 
 
@@ -65,15 +64,15 @@ for pair in pairwise_genomes:
         sys.exit(1)
 
     # Create adjacency sets of the two genomes
-    adjacency_setA = Adjacency_Set(first_content)
-    adjacency_setB = Adjacency_Set(second_content)
-
+    inter_info = Intermediate_Genome(first_content, second_content)
+    inter_info.create_adjacency_sets()
     # Create the circular breakpoint graph of the two genomes
-    cBP = Circular_Breakpoint(adjacency_setA.adjacencies, adjacency_setB.adjacencies)
+    inter_info.connect_adjacencies()
     # Find all intermediate genomes
-    all_inter_genomes = Inter_Adjacencies(cBP.graph)
+    inter_info.get_all_inter_adj()
 
-    potential_ancestors.update({ (pair[0],pair[1]) : (cBP.graph, all_inter_genomes.intermediate_adjacencies) })
+
+    potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj)})
 
 for key,value in potential_ancestors.items():
     print key, len(value[1])
