@@ -9,7 +9,6 @@ import sys
 
 from input_parser import Input
 from Intermediate_Genome import Intermediate_Genome
-
 #################################
 
 
@@ -67,7 +66,7 @@ for pair in pairwise_genomes:
     inter_info = Intermediate_Genome(first_content, second_content)
     inter_info.create_adjacency_sets()
     # Create the circular breakpoint graph of the two genomes
-    inter_info.connect_adjacencies()
+    inter_info.create_circular_graph()
     # Find all intermediate genomes
     inter_info.get_all_inter_adj()
 

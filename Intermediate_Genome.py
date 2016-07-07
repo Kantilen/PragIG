@@ -2,11 +2,25 @@
 
 __author__ = 'klamkiewicz'
 
+#################################
+# Import section                #
+#################################
 import re
 import networkx as nx
+#################################
 
 class Intermediate_Genome():
+    '''
+    This class contains all information of two given (sibling) genomes in the NEWICK tree.
+    It stores the content of the genomes, the adjacency sets, the circular breakpoint graph between the genomes
+    and all possible intermediate adjacencies.
+    '''
     def __init__(self, genomeA, genomeB):
+        '''
+        Initialization. Nothing real exciting here.
+        :param genomeA: gene content of the first genome (list of identifier)
+        :param genomeB: gene content of the second genome (list of identifier)
+        '''
         self.genomeA = genomeA
         self.genomeB = genomeB
 
@@ -24,8 +38,7 @@ class Intermediate_Genome():
         '''
         This function reads the genome content and creates the adjacency set of it.
         Note that the genome should be represented in the UniMog input notation.
-        :param genome_content: UniMog representation of the genome. Type=List
-        :return: Adjacency set of the genome. Type=List (of strings)
+        The corresponding adjacency set is stored in the global variable.
         '''
 
         for ident,genome_content in self.genomes.items():
@@ -72,17 +85,16 @@ class Intermediate_Genome():
             else:
                 self.adj_set_B = adjacencies
 
-
-    def connect_adjacencies(self):
+    def create_circular_graph(self):
         '''
-        From a given adjacency set the single extremities are created and stored into dicts.
-        Each extremity points to its adjacency (or None, if it is a telomere)
-        :param adjA: Adjacency Set of the first_content genome
-        :param adjB: Adjacency Set of the second_content genome
-        :return: Returns the value of create_circular_graph()
+        Uses the networkx package to create the circular breakpoint graph of two given genomes.
+        First a dictionary for each adjacency set is created. Every extremity points to its adjacent extremity.
+        Afterwards the cBP is built with the help of these dictionaries.
+        The final graph is stored in the global variable circular_breakpoint.
         '''
-        adjacencies_a = {}
+        adjacencies_a = {} # adjacency dict
         adjacencies_b = {}
+        # wrapper for the iteration
         wrapper = [(self.adj_set_A, adjacencies_a), (self.adj_set_B, adjacencies_b)]
 
         for genome, adjacencies in wrapper:
@@ -96,17 +108,9 @@ class Intermediate_Genome():
                     adjacencies[single_extremity.group(1)] = single_extremity.group(2)
                     adjacencies[single_extremity.group(2)] = single_extremity.group(1)
 
-        return self.create_circular_graph(adjacencies_a, adjacencies_b)  # call function to create the cBP
-
-    def create_circular_graph(self, adjacencies_a, adjacencies_b):
-        '''
-        Uses the networkx package to create the circular breakpoint graph of two given genomes
-        :return: the circular breakpoint graph
-        '''
         colors = {'A': 'B',
                   'B': 'A'}
         G = nx.MultiGraph()
-
         # Since no Indel or Duplications are allowed, the keys of adjacencies_a/b are identical
         G.add_nodes_from(adjacencies_a.keys())  # each adjacency will be a vertex
         visited = []
