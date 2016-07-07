@@ -34,6 +34,25 @@ class Intermediate_Genome():
         self.circular_breakpoint = None
         self.inter_adj = set()
 
+    def validate_input(self):
+        '''
+        At the moment no duplications or indel events are allowed. Therefore the set of the genome content
+        has to be identical. This is checked here. The two contents of the global variables genomeA and genomeB
+        are evaluated.
+        :return: Boolean variable
+        '''
+        # remove signs and chromosomes
+        first_genome = [re.sub('-', '', x) for x in self.genomeA]
+        second_genome = [re.sub('-', '', x) for x in self.genomeB]
+
+        # symmetrical difference. Just take elements that are unique in one
+        # of the sets
+        first_genome = set(first_genome)
+        second_genome = set(second_genome)
+        difference = first_genome ^ second_genome
+
+        return (len(difference) == 0, difference)
+
     def create_adjacency_sets(self):
         '''
         This function reads the genome content and creates the adjacency set of it.

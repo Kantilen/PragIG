@@ -4,36 +4,14 @@
 # Import section                #
 #################################
 import argparse as args
-import re
 import sys
 
 from input_parser import Input
-from Intermediate_Genome import Intermediate_Genome
+from intermediate_genome import Intermediate_Genome
 #################################
 
 
 __author__ = 'klamkiewicz'
-
-def validate_input(first_genome, second_genome):
-    '''
-    At the moment no duplications or indel events are allowed. Therefore the set of the genome content
-    has to be identical. This is checked here.
-    :param first_genome: Sequence of the first_content genome
-    :param second_genome:  Sequence of the second_content genome
-    :return: Boolean variable
-    '''
-
-    # remove signs and chromosomes
-    first_genome = [re.sub('-','',x) for x in first_genome]
-    second_genome = [re.sub('-', '', x) for x in second_genome]
-
-    # symmetrical difference. Just take elements that are unique in one
-    # of the sets
-    first_genome = set(first_genome)
-    second_genome = set(second_genome)
-    difference = first_genome ^ second_genome
-
-    return (len(difference) == 0, difference)
 
 # Commandline arguments
 parser = args.ArgumentParser(description="Enter two genomes in the input format of Unimog")
@@ -55,15 +33,20 @@ for pair in pairwise_genomes:
     first_content = input.genomes[pair[0]]
     second_content = input.genomes[pair[1]]
 
-    # content validation; no singletons allowed
-    same_content = validate_input(first_content, second_content)
-    if not same_content[0]:
+
+    # Create instance of Intermediate_Genome with the two current sibling-genomes.
+    inter_info = Intermediate_Genome(first_content, second_content)
+
+    # check if content of genomes is identical.
+    isValid = inter_info.validate_input()
+
+    # if not, quit the process
+    if not isValid[0]:
         print >> sys.stderr, "Content of the genomes is not equal. Check your input!"
         print >> sys.stderr, " ".join(["%s" % x for x in same_content[1]])
         sys.exit(1)
 
-    # Create adjacency sets of the two genomes
-    inter_info = Intermediate_Genome(first_content, second_content)
+    # Adjacency sets are created
     inter_info.create_adjacency_sets()
     # Create the circular breakpoint graph of the two genomes
     inter_info.create_circular_graph()
