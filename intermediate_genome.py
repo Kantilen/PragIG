@@ -1,4 +1,4 @@
-#!/usr/bin/python
+    #!/usr/bin/python
 
 __author__ = 'klamkiewicz'
 
@@ -15,21 +15,22 @@ class Intermediate_Genome():
     It stores the content of the genomes, the adjacency sets, the circular breakpoint graph between the genomes
     and all possible intermediate adjacencies.
     '''
-    def __init__(self, genomeA, genomeB):
+    def __init__(self, nameA, nameB, genomeA, genomeB):
         '''
         Initialization. Nothing real exciting here.
         :param genomeA: gene content of the first genome (list of identifier)
         :param genomeB: gene content of the second genome (list of identifier)
         '''
+
+        self.first = nameA
+        self.second = nameB
+
         self.genomeA = genomeA
         self.genomeB = genomeB
 
-        self.genomes = {'A':self.genomeA, 'B':self.genomeB}
+        self.genomes = {self.first:self.genomeA, self.second:self.genomeB}
 
-        self.adj_set_A = set()
-        self.adj_set_B = set()
-
-        self.adjacencies = {'A':self.adj_set_A, 'B':self.adj_set_B}
+        self.adjacencies = {}
 
         self.circular_breakpoint = None
         self.inter_adj = set()
@@ -99,10 +100,12 @@ class Intermediate_Genome():
                     current_chromosome.append('%st' % gene)
                     current_chromosome.append('%sh' % gene)
 
-            if ident == 'A':
-                self.adj_set_A = adjacencies
-            else:
-                self.adj_set_B = adjacencies
+            self.adjacencies.update({ident:adjacencies})
+
+            #if ident == self.first:
+            #    self.adj_set_A = adjacencies
+            #else:
+            #    self.adj_set_B = adjacencies
 
     def create_circular_graph(self):
         '''
@@ -113,8 +116,12 @@ class Intermediate_Genome():
         '''
         adjacencies_a = {} # adjacency dict
         adjacencies_b = {}
+
+        adj_set_A = self.adjacencies[self.first]
+        adj_set_B = self.adjacencies[self.second]
+
         # wrapper for the iteration
-        wrapper = [(self.adj_set_A, adjacencies_a), (self.adj_set_B, adjacencies_b)]
+        wrapper = [(adj_set_A, adjacencies_a), (adj_set_B, adjacencies_b)]
 
         for genome, adjacencies in wrapper:
             for adjacency in genome:
@@ -241,3 +248,6 @@ class Intermediate_Genome():
                     # between 1h2t and 2t1h. We might change this at some point.
                     if not '%s%s' % (second, first) in self.inter_adj:
                         self.inter_adj.add('%s%s' % (first, second))
+
+    def create_binary_vector(self):
+        print 'Hello World'

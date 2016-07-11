@@ -35,7 +35,7 @@ for pair in pairwise_genomes:
 
 
     # Create instance of Intermediate_Genome with the two current sibling-genomes.
-    inter_info = Intermediate_Genome(first_content, second_content)
+    inter_info = Intermediate_Genome(pair[0], pair[1], first_content, second_content)
 
     # check if content of genomes is identical.
     is_valid = inter_info.validate_input()
