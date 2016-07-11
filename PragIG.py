@@ -56,5 +56,7 @@ for pair in pairwise_genomes:
 
     potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj)})
 
+    inter_info.create_binary_vector()
+
 for key,value in potential_ancestors.items():
     print key, len(value[1])

@@ -7,6 +7,7 @@ __author__ = 'klamkiewicz'
 #################################
 import re
 import networkx as nx
+import numpy as np
 #################################
 
 class Intermediate_Genome():
@@ -34,6 +35,8 @@ class Intermediate_Genome():
 
         self.circular_breakpoint = None
         self.inter_adj = set()
+
+        self.binaries = {}
 
     def validate_input(self):
         '''
@@ -250,4 +253,15 @@ class Intermediate_Genome():
                         self.inter_adj.add('%s%s' % (first, second))
 
     def create_binary_vector(self):
-        print 'Hello World'
+
+        for indent,adj_set in self.adjacencies.items():
+
+            binary = np.empty([1,len(self.inter_adj)], dtype=int)
+
+            for index,int_adj in enumerate(self.inter_adj):
+                if int_adj in adj_set:
+                    np.put(binary, index, 1)
+                else:
+                    np.put(binary, index, 0)
+            self.binaries.update({indent:binary})
+        print self.binaries
