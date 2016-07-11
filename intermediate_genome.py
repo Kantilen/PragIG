@@ -251,16 +251,22 @@ class Intermediate_Genome():
                     # between 1h2t and 2t1h. We might change this at some point.
                     if not '%s%s' % (second, first) in self.inter_adj:
                         self.inter_adj.add('%s%s' % (first, second))
+        self.inter_adj = list(self.inter_adj)
 
     def create_binary_vector(self):
-
+        '''
+        This function creates an numpy array that represents the binary vector of
+        adjacencies in the two genomes that have to compared.
+        '''
         for indent,adj_set in self.adjacencies.items():
 
-            binary = np.empty([1,len(self.inter_adj)], dtype=int)
+            binary = np.zeros([1,len(self.inter_adj)], dtype=int)
+            for observed_adj in adj_set:
+                np.put(binary, self.inter_adj.index(observed_adj),1)
 
-            for index,int_adj in enumerate(self.inter_adj):
-                if int_adj in adj_set:
-                    np.put(binary, index, 1)
-                else:
-                    np.put(binary, index, 0)
+            #for index,int_adj in enumerate(self.inter_adj):
+            #    if int_adj in adj_set:
+            #        np.put(binary, index, 1)
+            #    else:
+            #        np.put(binary, index, 0)
             self.binaries.update({indent:binary})
