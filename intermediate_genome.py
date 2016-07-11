@@ -261,12 +261,12 @@ class Intermediate_Genome():
         for indent,adj_set in self.adjacencies.items():
 
             binary = np.zeros([1,len(self.inter_adj)], dtype=int)
-            for observed_adj in adj_set:
-                np.put(binary, self.inter_adj.index(observed_adj),1)
+            #for observed_adj in adj_set:
+            #    np.put(binary, self.inter_adj.index(observed_adj),1)
 
-            #for index,int_adj in enumerate(self.inter_adj):
-            #    if int_adj in adj_set:
-            #        np.put(binary, index, 1)
-            #    else:
-            #        np.put(binary, index, 0)
+            for index,int_adj in enumerate(self.inter_adj):
+                if int_adj in adj_set:
+                    np.put(binary, index, 1)
+                else:
+                    np.put(binary, index, 0)
             self.binaries.update({indent:binary})
