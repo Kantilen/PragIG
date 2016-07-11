@@ -264,4 +264,3 @@ class Intermediate_Genome():
                 else:
                     np.put(binary, index, 0)
             self.binaries.update({indent:binary})
-        print self.binaries
