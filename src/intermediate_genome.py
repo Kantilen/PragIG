@@ -69,8 +69,8 @@ class Intermediate_Genome():
             current_chromosome = []  # this is needed if there are more chromosomes
 
             # if not sign is given, circular chromosomes are default
-            if not (genome_content[-1] == ')' or genome_content[-1] == '|'):
-                genome_content.append(')')
+            if not (genome_content[-1] == ')' or genome_content[-1] == '$'):
+                genome_content.append('$')
 
             # main iteration
             for index, gene in enumerate(genome_content):
@@ -86,7 +86,7 @@ class Intermediate_Genome():
                     current_chromosome = iter(current_chromosome)
                     adjacencies.extend([ex + next(current_chromosome) for ex in current_chromosome])
 
-                    if gene == '|':  # linear chromosome needs telomeres
+                    if gene == '$':  # linear chromosome needs telomeres
                         adjacencies.insert(0, first)
                         adjacencies.append(last)
                     if gene == ')':  # circular chromosomes needs another adjacency

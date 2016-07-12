@@ -9,6 +9,8 @@ import sys
 from input_parser import Input
 from intermediate_genome import Intermediate_Genome
 from genome_sampler import Genome_Sampler
+from model import Genome
+from intermediate_genome_2 import Intermediate_Genome as IG
 #################################
 
 
@@ -47,18 +49,29 @@ for pair in pairwise_genomes:
         print >> sys.stderr, " ".join(["%s" % x for x in is_valid[1]])
         sys.exit(1)
 
+    test_genome = Genome(pair[0],first_content)
+    other_genome = Genome(pair[1],second_content)
+
+    test_inter = IG(test_genome, other_genome)
+
+    #print len(test_genome.create_adjacency_set()), test_genome.create_adjacency_set()[0].first_ex
+    #print len(other_genome.create_adjacency_set()), other_genome.create_adjacency_set()[0].first_ex
+
     # Adjacency sets are created
     inter_info.create_adjacency_sets()
+    #print (inter_info.adjacencies[pair[0]][0])
+    #print(inter_info.adjacencies[pair[1]][0])
+
     # Create the circular breakpoint graph of the two genomes
-    inter_info.create_circular_graph()
+    test_inter.create_circular_graph()
     # Find all intermediate genomes
-    inter_info.get_all_inter_adj()
+    test_inter.get_all_inter_adj()
     # Create binary vector
-    inter_info.create_binary_vector()
+    test_inter.create_binary_vector()
     # Update everything
-    potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj, inter_info.binaries)})
+    potential_ancestors.update({(pair[0],pair[1]) : (test_inter.circular_breakpoint, test_inter.inter_adj, test_inter.binaries)})
 
     sample_genomes = Genome_Sampler(potential_ancestors[(pair[0],pair[1])], 1000)
 
 for key,value in potential_ancestors.items():
-    print key, len(value[1]), value[2]
+    print key, value[0].edges(), len(value[1]), value[2]

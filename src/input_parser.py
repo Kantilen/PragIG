@@ -67,7 +67,8 @@ class Input:
                     continue
 
                 if not current_genome.startswith('>'):
-                    value.extend(current_genome.rstrip('$\n ').split(' '))
+                    #value.extend(current_genome.rstrip('$\n ').split(' '))
+                    value.extend(current_genome.rstrip('\n ').split(' '))
 
                 else:
                     if not key:
