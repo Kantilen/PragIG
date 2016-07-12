@@ -8,6 +8,7 @@ __author__ = 'klamkiewicz'
 import re
 import networkx as nx
 import numpy as np
+from model import Adjacency
 #################################
 
 class Intermediate_Genome():
@@ -22,7 +23,6 @@ class Intermediate_Genome():
         :param genomeA: gene content of the first genome (list of identifier)
         :param genomeB: gene content of the second genome (list of identifier)
         '''
-
 
         self.genomeA = genomeA.content
         self.genomeB = genomeB.content
@@ -58,59 +58,6 @@ class Intermediate_Genome():
 
         return (len(difference) == 0, difference)
 
-    def create_adjacency_sets(self):
-        '''
-        This function reads the genome content and creates the adjacency set of it.
-        Note that the genome should be represented in the UniMog input notation.
-        The corresponding adjacency set is stored in the global variable.
-        '''
-
-        for ident,genome_content in self.genomes.items():
-            adjacencies = []  # returned value
-            current_chromosome = []  # this is needed if there are more chromosomes
-
-            # if not sign is given, circular chromosomes are default
-            if not (genome_content[-1] == ')' or genome_content[-1] == '$'):
-                genome_content.append('$')
-
-            # main iteration
-            for index, gene in enumerate(genome_content):
-                if not (re.match('[\d*\w*]+', gene) or gene.startswith('-')):  # chromosome sign detected
-
-                    # the first_content and last extremity have to be considered separately
-                    first = current_chromosome[0]
-                    last = current_chromosome[-1]
-                    current_chromosome.remove(first)
-                    current_chromosome.remove(last)
-
-                    # connecting adjacencies
-                    current_chromosome = iter(current_chromosome)
-                    adjacencies.extend([ex + next(current_chromosome) for ex in current_chromosome])
-
-                    if gene == '$':  # linear chromosome needs telomeres
-                        adjacencies.insert(0, first)
-                        adjacencies.append(last)
-                    if gene == ')':  # circular chromosomes needs another adjacency
-                        adjacencies.append('%s%s' % (last, first))
-
-                    current_chromosome = []  # clear the chromosome
-                    continue
-
-                # orientation of the gene is considered here
-                if gene.startswith('-'):  # negative sign is ignored, but extremities are switched
-                    current_chromosome.append('%sh' % gene[1:])
-                    current_chromosome.append('%st' % gene[1:])
-                else:
-                    current_chromosome.append('%st' % gene)
-                    current_chromosome.append('%sh' % gene)
-
-            self.adjacencies.update({ident:adjacencies})
-
-            #if ident == self.first:
-            #    self.adj_set_A = adjacencies
-            #else:
-            #    self.adj_set_B = adjacencies
-
     def create_circular_graph(self):
         '''
         Uses the networkx package to create the circular breakpoint graph of two given genomes.
@@ -129,14 +76,11 @@ class Intermediate_Genome():
 
         for genome, adjacencies in wrapper:
             for adjacency in genome:
-                # TODO: This regex might get problems, if gene marker are called 't' or 'h'
-                single_extremity = re.search('([\d*\w*]+[t|h])([\d*\w*]+[t|h])',
-                                             adjacency)  # Regex to find single extremities
-                if not single_extremity:
-                    adjacencies[adjacency] = None  # telomere
+                if adjacency.is_telomere():
+                    adjacencies[adjacency.first_ex] = None
                 else:
-                    adjacencies[single_extremity.group(1)] = single_extremity.group(2)
-                    adjacencies[single_extremity.group(2)] = single_extremity.group(1)
+                    adjacencies[adjacency.first_ex] = adjacency.second_ex
+                    adjacencies[adjacency.second_ex] = adjacency.first_ex
 
         colors = {'A': 'B',
                   'B': 'A'}
@@ -243,15 +187,16 @@ class Intermediate_Genome():
                     if first.startswith('Telo') and second.startswith('Telo'):
                         continue
                     if first.startswith('Telo'):
-                        self.inter_adj.add(second)
+                        self.inter_adj.add(Adjacency(second,None))
                         continue
                     if second.startswith('Telo'):
-                        self.inter_adj.add(first)
+                        self.inter_adj.add(Adjacency(first,None))
                         continue
                     # some nasty set issue. Since we are dealing with strings, there is a difference
                     # between 1h2t and 2t1h. We might change this at some point.
-                    if not '%s%s' % (second, first) in self.inter_adj:
-                        self.inter_adj.add('%s%s' % (first, second))
+                    new_adj = Adjacency(first,second)
+                    if not any([new_adj.equal(x) for x in self.inter_adj]):
+                        self.inter_adj.add(new_adj)
         self.inter_adj = list(self.inter_adj)
 
     def create_binary_vector(self):
@@ -260,14 +205,7 @@ class Intermediate_Genome():
         adjacencies in the two genomes that have to compared.
         '''
         for indent,adj_set in self.adjacencies.items():
-
+            print indent
             binary = np.zeros([1,len(self.inter_adj)], dtype=int)
-            #for observed_adj in adj_set:
-            #    np.put(binary, self.inter_adj.index(observed_adj),1)
 
-            for index,int_adj in enumerate(self.inter_adj):
-                if int_adj in adj_set:
-                    np.put(binary, index, 1)
-                else:
-                    np.put(binary, index, 0)
-            self.binaries.update({indent:binary})
+

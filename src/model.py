@@ -14,21 +14,22 @@ class Adjacency():
         self.second_ex = second_ex
 
     def __str__(self):
-        return "%s%s" % (self.first_ex, self.second_ex)
+        return "(%s,%s)" % (self.first_ex, self.second_ex)
 
     def equal(self,adjacency):
         return (self.first_ex == adjacency.first_ex and self.second_ex == adjacency.second_ex) or \
                (self.first_ex == adjacency.second_ex and self.second_ex == adjacency.first_ex)
 
     def is_telomere(self):
-        return (self.first_ex == None) or (self.second_ex == None)
+        return (self.second_ex == None)
 
 
 class Genome():
     def __init__(self,name,content):
         self.name = name
         self.content = content
-        self.adjacency_set = set()
+        self.adjacency_set = self.create_adjacency_set()
+
 
     def create_adjacency_set(self):
         '''
@@ -73,10 +74,13 @@ class Genome():
                 current_chromosome.append('%st' % gene)
                 current_chromosome.append('%sh' % gene)
 
-        self.adjacency_set = adjacencies
+        return adjacencies
 
     def length(self):
         return len(self.content)
 
     def adj_length(self):
         return len(self.adjacency_set)
+
+    def contains(self,adjacency):
+        return any([adjacency.equal(x) for x in self.adjacency_set])
