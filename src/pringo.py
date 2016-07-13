@@ -56,11 +56,14 @@ for pair in pairwise_genomes:
     # Find all intermediate genomes
     inter_info.get_all_inter_adj()
     # Create binary vector
-    inter_info.create_binary_vector()
+    binary_of_first = first_genome.create_binary_vector(inter_info.inter_adj)
+    binary_of_second = second_genome.create_binary_vector(inter_info.inter_adj)
+    binaries = {pair[0]:binary_of_first, pair[1]:binary_of_second}
+    #inter_info.create_binary_vector()
     # Update everything
-    potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj, inter_info.binaries)})
+    potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj, binaries)})
 
-    #sample_genomes = Genome_Sampler(potential_ancestors[(pair[0],pair[1])], 1000)
+    Genome_Sampler(inter_info.inter_adj, 10, len(first_genome.adjacency_set))
 
 for key,value in potential_ancestors.items():
     print key, len(value[1]), value[2]

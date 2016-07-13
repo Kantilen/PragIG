@@ -34,6 +34,8 @@ class Adjacency():
         return (self in adj_list)
 
     def contains_extremity(self, ext):
+        if not ext:
+            return False
         return (self.first_ex == ext or self.second_ex == ext)
 
 
@@ -89,13 +91,18 @@ class Genome():
 
         return adjacencies
 
-    def create_binary_vector(self, inter_adjacency):
-        binary = np.zeros([1,len(inter_adjacency)], dtype=int)
-        for adjacency in self.adjacency_set:
-            try:
-                np.put(binary,1,inter_adjacency.index(adjacency))
-            except ValueError:
-                continue
+    def create_binary_vector(self, inter_adj):
+        '''
+        This function creates an numpy array that represents the binary vector of
+        adjacencies in the two genomes that have to compared.
+        '''
+        preprocessing_dict = dict.fromkeys(self.adjacency_set)  # This makes O(k+n) instead of O(k*n)!
+        binary = np.zeros([1, len(inter_adj)], dtype=int)
+
+        for index, int_adj in enumerate(inter_adj):
+            if int_adj in preprocessing_dict:
+                np.put(binary, index, 1)
+        return binary
 
     def length(self):
         return len(self.content)
