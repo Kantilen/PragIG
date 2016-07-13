@@ -63,7 +63,7 @@ for pair in pairwise_genomes:
     # Update everything
     potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj, binaries)})
 
-    Genome_Sampler(inter_info.inter_adj, 10, len(first_genome.adjacency_set))
+    Genome_Sampler(inter_info.inter_adj, 2, len(first_genome.adjacency_set))
 
 for key,value in potential_ancestors.items():
     print key, len(value[1]), value[2]

@@ -15,6 +15,9 @@ class Adjacency():
         self.second_ex = second_ex
 
     def __repr__(self):
+        return "%s%s" % (self.first_ex, self.second_ex)
+
+    def __str__(self):
         return "(%s,%s)" % (self.first_ex, self.second_ex)
 
     def __eq__(self,other):
