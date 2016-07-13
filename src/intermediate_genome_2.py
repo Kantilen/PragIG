@@ -195,9 +195,13 @@ class Intermediate_Genome():
                     # some nasty set issue. Since we are dealing with strings, there is a difference
                     # between 1h2t and 2t1h. We might change this at some point.
                     new_adj = Adjacency(first,second)
-                    if not any([new_adj.equal(x) for x in self.inter_adj]):
+                    #contained = (new_adj.is_in_list(self.inter_adj))
+                    #if not any(contained):
+                    #if not any(new_adj.equal(x) for x in generator_adj):
+                    if not new_adj.is_in_list(self.inter_adj):
                         self.inter_adj.add(new_adj)
         self.inter_adj = list(self.inter_adj)
+        print len(self.inter_adj)
 
     def create_binary_vector(self):
         '''
@@ -205,7 +209,6 @@ class Intermediate_Genome():
         adjacencies in the two genomes that have to compared.
         '''
         for indent,adj_set in self.adjacencies.items():
-            print indent
             binary = np.zeros([1,len(self.inter_adj)], dtype=int)
 
 

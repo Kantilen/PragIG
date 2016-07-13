@@ -54,24 +54,19 @@ for pair in pairwise_genomes:
 
     test_inter = IG(test_genome, other_genome)
 
-    #print len(test_genome.create_adjacency_set()), test_genome.create_adjacency_set()[0].first_ex
-    #print len(other_genome.create_adjacency_set()), other_genome.create_adjacency_set()[0].first_ex
-
     # Adjacency sets are created
-    #inter_info.create_adjacency_sets()
-    #print (inter_info.adjacencies[pair[0]][0])
-    #print(inter_info.adjacencies[pair[1]][0])
+    inter_info.create_adjacency_sets()
 
     # Create the circular breakpoint graph of the two genomes
-    test_inter.create_circular_graph()
+    inter_info.create_circular_graph()
     # Find all intermediate genomes
-    test_inter.get_all_inter_adj()
+    inter_info.get_all_inter_adj()
     # Create binary vector
-    test_inter.create_binary_vector()
+    inter_info.create_binary_vector()
     # Update everything
-    potential_ancestors.update({(pair[0],pair[1]) : (test_inter.circular_breakpoint, test_inter.inter_adj)})
+    potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj)})
 
-    #sample_genomes = Genome_Sampler(potential_ancestors[(pair[0],pair[1])], 1000)
+    sample_genomes = Genome_Sampler(potential_ancestors[(pair[0],pair[1])], 1000)
 
 for key,value in potential_ancestors.items():
     print key, len(value[1])

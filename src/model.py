@@ -16,12 +16,28 @@ class Adjacency():
     def __str__(self):
         return "(%s,%s)" % (self.first_ex, self.second_ex)
 
-    def equal(self,adjacency):
-        return (self.first_ex == adjacency.first_ex and self.second_ex == adjacency.second_ex) or \
-               (self.first_ex == adjacency.second_ex and self.second_ex == adjacency.first_ex)
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self,other):
+        if isinstance(other, Adjacency):
+            return (self.first_ex == other.first_ex and self.second_ex == other.second_ex) or \
+               (self.first_ex == other.second_ex and self.second_ex == other.first_ex)
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(self.__repr__())
+
+    #def equal(self,adjacency):
+    #    return (self.first_ex == adjacency.first_ex and self.second_ex == adjacency.second_ex) or \
+    #           (self.first_ex == adjacency.second_ex and self.second_ex == adjacency.first_ex)
 
     def is_telomere(self):
         return (self.second_ex == None)
+
+    def is_in_list(self, adj_list):
+        return (self in adj_list)
 
 
 class Genome():
@@ -83,4 +99,4 @@ class Genome():
         return len(self.adjacency_set)
 
     def contains(self,adjacency):
-        return any([adjacency.equal(x) for x in self.adjacency_set])
+        return (adjacency in self.adjacency_set)
