@@ -29,10 +29,6 @@ class Adjacency():
     def __hash__(self):
         return hash(self.__repr__())
 
-    #def equal(self,adjacency):
-    #    return (self.first_ex == adjacency.first_ex and self.second_ex == adjacency.second_ex) or \
-    #           (self.first_ex == adjacency.second_ex and self.second_ex == adjacency.first_ex)
-
     def is_telomere(self):
         return (self.second_ex == None)
 

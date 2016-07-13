@@ -7,10 +7,9 @@ import argparse as args
 import sys
 
 from input_parser import Input
-from intermediate_genome import Intermediate_Genome
 from genome_sampler import Genome_Sampler
 from model import Genome
-from intermediate_genome_2 import Intermediate_Genome as IG
+from ig_info import Intermediate_Genome as IG
 #################################
 
 
@@ -38,7 +37,10 @@ for pair in pairwise_genomes:
 
 
     # Create instance of Intermediate_Genome with the two current sibling-genomes.
-    inter_info = Intermediate_Genome(pair[0], pair[1], first_content, second_content)
+    first_genome = Genome(pair[0], first_content)
+    second_genome = Genome(pair[1], second_content)
+
+    inter_info = IG(first_genome, second_genome)
 
     # check if content of genomes is identical.
     is_valid = inter_info.validate_input()
@@ -48,14 +50,6 @@ for pair in pairwise_genomes:
         print >> sys.stderr, "Content of the genomes is not equal. Check your input!"
         print >> sys.stderr, " ".join(["%s" % x for x in is_valid[1]])
         sys.exit(1)
-
-    test_genome = Genome(pair[0],first_content)
-    other_genome = Genome(pair[1],second_content)
-
-    test_inter = IG(test_genome, other_genome)
-
-    # Adjacency sets are created
-    inter_info.create_adjacency_sets()
 
     # Create the circular breakpoint graph of the two genomes
     inter_info.create_circular_graph()

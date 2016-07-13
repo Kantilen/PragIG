@@ -17,5 +17,3 @@ class Genome_Sampler():
         self.breakpoint_graph = data[0]
         self.all_adjacencies = data[1]
         self.iteration = iter
-
-        print len(self.all_adjacencies)

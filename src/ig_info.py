@@ -192,16 +192,11 @@ class Intermediate_Genome():
                     if second.startswith('Telo'):
                         self.inter_adj.add(Adjacency(first,None))
                         continue
-                    # some nasty set issue. Since we are dealing with strings, there is a difference
-                    # between 1h2t and 2t1h. We might change this at some point.
+
                     new_adj = Adjacency(first,second)
-                    #contained = (new_adj.is_in_list(self.inter_adj))
-                    #if not any(contained):
-                    #if not any(new_adj.equal(x) for x in generator_adj):
                     if not new_adj.is_in_list(self.inter_adj):
                         self.inter_adj.add(new_adj)
         self.inter_adj = list(self.inter_adj)
-        print len(self.inter_adj)
 
     def create_binary_vector(self):
         '''
