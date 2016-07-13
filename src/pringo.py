@@ -58,9 +58,9 @@ for pair in pairwise_genomes:
     # Create binary vector
     inter_info.create_binary_vector()
     # Update everything
-    potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj)})
+    potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj, inter_info.binaries)})
 
-    sample_genomes = Genome_Sampler(potential_ancestors[(pair[0],pair[1])], 1000)
+    #sample_genomes = Genome_Sampler(potential_ancestors[(pair[0],pair[1])], 1000)
 
 for key,value in potential_ancestors.items():
-    print key, len(value[1])
+    print key, len(value[1]), value[2]

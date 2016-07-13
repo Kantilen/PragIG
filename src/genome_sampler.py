@@ -6,6 +6,7 @@ __author__ = 'klamkiewicz'
 # Import section                #
 #################################
 import numpy as np
+from model import Genome
 #################################
 
 class Genome_Sampler():
@@ -17,3 +18,11 @@ class Genome_Sampler():
         self.breakpoint_graph = data[0]
         self.all_adjacencies = data[1]
         self.iteration = iter
+
+        self.sampled_genomes = []
+
+        self.create_genomes(self.all_adjacencies, self.iteration)
+
+    def create_genomes(self, adjacency_set, iteration):
+        print #type(adjacency_set)
+

@@ -6,6 +6,7 @@ __author__ = 'klamkiewicz'
 # Import section                #
 #################################
 import re
+import sys
 import networkx as nx
 import numpy as np
 from model import Adjacency
@@ -203,7 +204,16 @@ class Intermediate_Genome():
         This function creates an numpy array that represents the binary vector of
         adjacencies in the two genomes that have to compared.
         '''
-        for indent,adj_set in self.adjacencies.items():
-            binary = np.zeros([1,len(self.inter_adj)], dtype=int)
+        for indent, adj_set in self.adjacencies.items():
+            print indent
+            test_dict = dict.fromkeys(adj_set)
+            binary = np.zeros([1, len(self.inter_adj)], dtype=int)
+            # for observed_adj in adj_set:
+            #    np.put(binary, self.inter_adj.index(observed_adj),1)
 
-
+            for index, int_adj in enumerate(self.inter_adj):
+                if int_adj in test_dict:
+                    np.put(binary, index, 1)
+                else:
+                    np.put(binary, index, 0)
+            self.binaries.update({indent: binary})

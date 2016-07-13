@@ -6,6 +6,7 @@ __author__ = 'klamkiewicz'
 # Import section                #
 #################################
 import re
+import numpy as np
 #################################
 
 class Adjacency():
@@ -13,11 +14,8 @@ class Adjacency():
         self.first_ex = first_ex
         self.second_ex = second_ex
 
-    def __str__(self):
-        return "(%s,%s)" % (self.first_ex, self.second_ex)
-
     def __repr__(self):
-        return self.__str__()
+        return "(%s,%s)" % (self.first_ex, self.second_ex)
 
     def __eq__(self,other):
         if isinstance(other, Adjacency):
@@ -34,6 +32,9 @@ class Adjacency():
 
     def is_in_list(self, adj_list):
         return (self in adj_list)
+
+    def contains_extremity(self, ext):
+        return (self.first_ex == ext or self.second_ex == ext)
 
 
 class Genome():
@@ -87,6 +88,14 @@ class Genome():
                 current_chromosome.append('%sh' % gene)
 
         return adjacencies
+
+    def create_binary_vector(self, inter_adjacency):
+        binary = np.zeros([1,len(inter_adjacency)], dtype=int)
+        for adjacency in self.adjacency_set:
+            try:
+                np.put(binary,1,inter_adjacency.index(adjacency))
+            except ValueError:
+                continue
 
     def length(self):
         return len(self.content)
