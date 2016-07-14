@@ -7,6 +7,7 @@ __author__ = 'klamkiewicz'
 #################################
 from collections import defaultdict
 import random
+import sys
 #################################
 
 class Genome_Sampler():
@@ -25,8 +26,8 @@ class Genome_Sampler():
         self.create_genomes()
 
     def preprocess_conflicts(self):
-
         for adj in self.adjacencies:
+
             if adj.first_ex:
                 self.conflicting_adjacencies[adj.first_ex].add(adj)
             if adj.second_ex:
@@ -34,12 +35,17 @@ class Genome_Sampler():
 
     def create_genomes(self):
         for i in range(self.iteration):
+            print "Step %d" % (i)
             sampled_genome = []
-            conflicts = set()
-            for k in range(self.size-1):
-                new_adj = random.choice(self.adjacencies)
-                while new_adj in conflicts:
-                    new_adj = random.choice(self.adjacencies)
-                conflicts = conflicts.union(self.conflicting_adjacencies[new_adj.first_ex].union(self.conflicting_adjacencies[new_adj.second_ex]))
-                sampled_genome.append(new_adj)
+            conflicts = dict.fromkeys((self.conflicting_adjacencies.keys()))
+
+            while conflicts:
+                new_adj = random.sample(conflicts.keys(), 2)
+                sampled_adj = self.conflicting_adjacencies[new_adj[0]].intersection(self.conflicting_adjacencies[new_adj[1]])
+                if not sampled_adj:
+                    continue
+
+                conflicts.pop(new_adj[0])
+                conflicts.pop(new_adj[1])
+                sampled_genome.append(list(sampled_adj)[0])
             self.sampled_genomes.append(sampled_genome)

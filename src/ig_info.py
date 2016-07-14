@@ -113,7 +113,6 @@ class Intermediate_Genome():
         index = 0
 
         for comp in components:
-
             if len(comp) == 1:  # telomere in both genomes
                 G.add_node("Telo%d" % (index))
                 G.add_edge("Telo%d" % (index), comp.nodes()[0], color='A')
@@ -187,11 +186,11 @@ class Intermediate_Genome():
                     if first.startswith('Telo') and second.startswith('Telo'):
                         continue
                     if first.startswith('Telo'):
-                        self.inter_adj.add(Adjacency(second,None))
+                        self.inter_adj.add(Adjacency(second,first))
                         continue
-                    if second.startswith('Telo'):
-                        self.inter_adj.add(Adjacency(first,None))
-                        continue
+                    #if second.startswith('Telo'):
+                    #    self.inter_adj.add(Adjacency(first,None))
+                    #    continue
 
                     new_adj = Adjacency(first,second)
                     if not new_adj.is_in_list(self.inter_adj):

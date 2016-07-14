@@ -32,6 +32,7 @@ potential_ancestors = {}
 # main iteration
 #TODO: Do a while-loop, pop the first element and update the list with the next (resolved) level in the tree.
 for pair in pairwise_genomes:
+    print pair
     first_content = input.genomes[pair[0]]
     second_content = input.genomes[pair[1]]
 
@@ -60,9 +61,13 @@ for pair in pairwise_genomes:
     binary_of_second = second_genome.create_binary_vector(inter_info.inter_adj)
     binaries = {pair[0]:binary_of_first, pair[1]:binary_of_second}
     # Update everything
-    potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj, binaries)})
 
-    Genome_Sampler(inter_info.inter_adj, 2, len(first_genome.adjacency_set))
+
+    sampled_genomes = Genome_Sampler(inter_info.inter_adj, 10, len(first_genome.adjacency_set)).sampled_genomes
+
+    Genome.genome_from_adjacencies("s1", sampled_genomes[0])
+
+    potential_ancestors.update({(pair[0], pair[1]): (inter_info.circular_breakpoint, inter_info.inter_adj, binaries)})
 
 for key,value in potential_ancestors.items():
     print key, len(value[1]), value[2]

@@ -7,6 +7,7 @@ __author__ = 'klamkiewicz'
 #################################
 import re
 import numpy as np
+import sys
 #################################
 
 class Adjacency():
@@ -29,6 +30,9 @@ class Adjacency():
 
     def __hash__(self):
         return hash(self.__repr__())
+
+    def get_extremities(self):
+        return [self.first_ex, self.second_ex]
 
     def is_telomere(self):
         return (self.second_ex == None)
@@ -115,3 +119,50 @@ class Genome():
 
     def contains(self,adjacency):
         return (adjacency in self.adjacency_set)
+
+
+    @staticmethod
+    def genome_from_adjacencies(name, adjacency_set):
+        extremities = {'h': 't', 't':'h'}
+        adjacencies = {}
+        telomere = []
+        content = []
+
+        for adjacency in adjacency_set:
+            if adjacency.first_ex in adjacencies.keys():
+                print adjacency, adjacencies[adjacency.first_ex]
+            if adjacency.second_ex in adjacencies.keys():
+                print adjacency, adjacencies[adjacency.second_ex]
+            if adjacency.second_ex.startswith('Telo'):
+                telomere.append(adjacency.first_ex)
+                continue
+            if adjacency.first_ex.startswith('Telo'):
+                telomere.append(adjacency.second_ex)
+                continue
+            adjacencies.update({adjacency.first_ex : adjacency.second_ex, adjacency.second_ex : adjacency.first_ex})
+
+        current_gene = telomere[0]
+
+        while adjacencies:
+
+            try:
+                adjacencies.pop(current_gene)
+            except KeyError:
+                pass
+
+            single_extremity = re.search('([\d*]+)([t|h])', current_gene)
+            orientation = single_extremity.group(2)
+            gene = single_extremity.group(1)
+            if orientation == 'h':
+                content.append('-%s' % (gene))
+            else:
+                content.append('%s' % (gene))
+            other_extremity = "%s%s" % (gene,extremities[orientation])
+
+            try:
+                current_gene = adjacencies[other_extremity]
+                adjacencies.pop(other_extremity)
+            except KeyError:
+                break
+
+        return Genome(name, content)
