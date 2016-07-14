@@ -59,7 +59,6 @@ for pair in pairwise_genomes:
     binary_of_first = first_genome.create_binary_vector(inter_info.inter_adj)
     binary_of_second = second_genome.create_binary_vector(inter_info.inter_adj)
     binaries = {pair[0]:binary_of_first, pair[1]:binary_of_second}
-    #inter_info.create_binary_vector()
     # Update everything
     potential_ancestors.update({(pair[0],pair[1]) : (inter_info.circular_breakpoint, inter_info.inter_adj, binaries)})
 
