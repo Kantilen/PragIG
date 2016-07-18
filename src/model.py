@@ -75,7 +75,7 @@ class Genome():
                 current_chromosome.remove(first)
                 current_chromosome.remove(last)
 
-                # connecting adjacencies
+                # connecting graph
                 current_chromosome = iter(current_chromosome)
                 adjacencies.extend([Adjacency(ex,next(current_chromosome)) for ex in current_chromosome])
 
@@ -101,7 +101,7 @@ class Genome():
     def create_binary_vector(self, inter_adj):
         '''
         This function creates an numpy array that represents the binary vector of
-        adjacencies in the two genomes that have to compared.
+        graph in the two genomes that have to compared.
         '''
         preprocessing_dict = dict.fromkeys(self.adjacency_set)  # This makes O(k+n) instead of O(k*n)!
         binary = np.zeros([1, len(inter_adj)], dtype=int)

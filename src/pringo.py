@@ -55,19 +55,20 @@ for pair in pairwise_genomes:
     # Create the circular breakpoint graph of the two genomes
     inter_info.create_circular_graph()
     # Find all intermediate genomes
-    inter_info.get_all_inter_adj()
+    #inter_info.get_all_inter_adj()
     # Create binary vector
-    binary_of_first = first_genome.create_binary_vector(inter_info.inter_adj)
-    binary_of_second = second_genome.create_binary_vector(inter_info.inter_adj)
-    binaries = {pair[0]:binary_of_first, pair[1]:binary_of_second}
+    #binary_of_first = first_genome.create_binary_vector(inter_info.inter_adj)
+    #binary_of_second = second_genome.create_binary_vector(inter_info.inter_adj)
+    #binaries = {pair[0]:binary_of_first, pair[1]:binary_of_second}
     # Update everything
 
+    sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 100).sampled_genomes
 
-    sampled_genomes = Genome_Sampler(inter_info.inter_adj, 10, len(first_genome.adjacency_set)).sampled_genomes
+    #sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 10, len(first_genome.adjacency_set)).sampled_genomes
 
-    Genome.genome_from_adjacencies("s1", sampled_genomes[0])
+    #Genome.genome_from_adjacencies("s1", sampled_genomes[0])
 
-    potential_ancestors.update({(pair[0], pair[1]): (inter_info.circular_breakpoint, inter_info.inter_adj, binaries)})
+    potential_ancestors.update({(pair[0], pair[1]): (inter_info.circular_breakpoint, sampled_genomes)})
 
 for key,value in potential_ancestors.items():
-    print key, len(value[1]), value[2]
+    print key, [len(x.content) for x in value[1]]

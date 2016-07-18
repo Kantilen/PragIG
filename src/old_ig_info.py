@@ -14,7 +14,7 @@ class Intermediate_Genome():
     '''
     This class contains all information of two given (sibling) genomes in the NEWICK tree.
     It stores the content of the genomes, the adjacency sets, the circular breakpoint graph between the genomes
-    and all possible intermediate adjacencies.
+    and all possible intermediate graph.
     '''
     def __init__(self, nameA, nameB, genomeA, genomeB):
         '''
@@ -82,7 +82,7 @@ class Intermediate_Genome():
                     current_chromosome.remove(first)
                     current_chromosome.remove(last)
 
-                    # connecting adjacencies
+                    # connecting graph
                     current_chromosome = iter(current_chromosome)
                     adjacencies.extend([ex + next(current_chromosome) for ex in current_chromosome])
 
@@ -106,9 +106,9 @@ class Intermediate_Genome():
             self.adjacencies.update({ident:adjacencies})
 
             #if ident == self.first:
-            #    self.adj_set_A = adjacencies
+            #    self.adj_set_A = graph
             #else:
-            #    self.adj_set_B = adjacencies
+            #    self.adj_set_B = graph
 
     def create_circular_graph(self):
         '''
@@ -218,9 +218,9 @@ class Intermediate_Genome():
 
     def get_all_inter_adj(self):
         '''
-        This function enumerates all vertices and finds the intermediate adjacencies.
+        This function enumerates all vertices and finds the intermediate graph.
         :param graph: circular breakpoint graph
-        :return: set of all intermediate adjacencies
+        :return: set of all intermediate graph
         '''
         # each component can be solved seperately
         for component in nx.connected_component_subgraphs(self.circular_breakpoint):
@@ -256,7 +256,7 @@ class Intermediate_Genome():
     def create_binary_vector(self):
         '''
         This function creates an numpy array that represents the binary vector of
-        adjacencies in the two genomes that have to compared.
+        graph in the two genomes that have to compared.
         '''
         for indent,adj_set in self.adjacencies.items():
 

@@ -15,7 +15,7 @@ class Intermediate_Genome():
     '''
     This class contains all information of two given (sibling) genomes in the NEWICK tree.
     It stores the content of the genomes, the adjacency sets, the circular breakpoint graph between the genomes
-    and all possible intermediate adjacencies.
+    and all possible intermediate graph.
     '''
     def __init__(self, genomeA, genomeB):
         '''
@@ -162,9 +162,9 @@ class Intermediate_Genome():
 
     def get_all_inter_adj(self):
         '''
-        This function enumerates all vertices and finds the intermediate adjacencies.
+        This function enumerates all vertices and finds the intermediate graph.
         :param graph: circular breakpoint graph
-        :return: set of all intermediate adjacencies
+        :return: set of all intermediate graph
         '''
         # each component can be solved seperately
         for component in nx.connected_component_subgraphs(self.circular_breakpoint):
@@ -200,7 +200,7 @@ class Intermediate_Genome():
     def create_binary_vector(self):
         '''
         This function creates an numpy array that represents the binary vector of
-        adjacencies in the two genomes that have to compared.
+        graph in the two genomes that have to compared.
         '''
         for indent, adj_set in self.adjacencies.items():
             preprocessing_dict = dict.fromkeys(adj_set) # This makes O(k+n) instead of O(k*n)!
