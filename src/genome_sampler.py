@@ -33,6 +33,7 @@ class Genome_Sampler():
             return []
         if len(cycle) == 2:
             return [model.Adjacency(cycle[0],cycle[1])]
+
         assert(len(cycle) % 2 == 0)
 
         adj = random.randint(1, len(cycle)/2 -1) * 2 + 1
