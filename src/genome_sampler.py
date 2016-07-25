@@ -31,12 +31,9 @@ class Genome_Sampler():
     def create_adjacency_from_cycle(self, cycle):
         if not cycle:
             return []
-        if len(cycle) == 2:
-            return [model.Adjacency(cycle[0],cycle[1])]
-
         assert(len(cycle) % 2 == 0)
 
-        adj = random.randint(1, len(cycle)/2 -1) * 2 + 1
+        adj = random.randint(0, len(cycle)/2 -1) * 2 + 1
         return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(cycle[0],cycle[adj])] + self.create_adjacency_from_cycle(cycle[adj+1:])
 
     def enumerate_vertices(self):

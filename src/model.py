@@ -7,6 +7,7 @@ __author__ = 'klamkiewicz'
 #################################
 import re
 import numpy as np
+from collections import Counter
 import sys
 #################################
 
@@ -120,6 +121,9 @@ class Genome():
     def contains(self,adjacency):
         return (adjacency in self.adjacency_set)
 
+    def chr_number(self):
+        return Counter(self.content)['$'] + Counter(self.content)[')']
+
 
     @staticmethod
     def genome_from_adjacencies(name, adjacency_set):
@@ -129,40 +133,99 @@ class Genome():
         content = []
 
         for adjacency in adjacency_set:
-            if adjacency.first_ex in adjacencies.keys():
-                print adjacency, adjacencies[adjacency.first_ex]
-            if adjacency.second_ex in adjacencies.keys():
-                print adjacency, adjacencies[adjacency.second_ex]
+        #    if adjacency.first_ex in adjacencies.keys():
+        #        print adjacency, adjacencies[adjacency.first_ex]
+        #    if adjacency.second_ex in adjacencies.keys():
+        #        print adjacency, adjacencies[adjacency.second_ex]
             if adjacency.second_ex.startswith('Telo'):
                 telomere.append(adjacency.first_ex)
+                adjacencies.update({adjacency.first_ex : None})
                 continue
             if adjacency.first_ex.startswith('Telo'):
                 telomere.append(adjacency.second_ex)
+                adjacencies.update({adjacency.second_ex : None})
                 continue
             adjacencies.update({adjacency.first_ex : adjacency.second_ex, adjacency.second_ex : adjacency.first_ex})
 
-        current_gene = telomere[0]
+        #print adjacencies
+        #print telomere
+        current_adjacency = None
+        linear = False
 
         while adjacencies:
 
+            if not current_adjacency:
+                if telomere:
+                    current_adjacency = telomere[0]
+                    telomere.remove(current_adjacency)
+                    linear = True
+                else:
+                    current_adjacency = adjacencies.keys()[0]
+                    linear = False
+                adjacencies.pop(current_adjacency)
+
+            single_extremity = re.search('([\d*]+)([t|h])', current_adjacency)
+            gene = single_extremity.group(1)
+            orientation = single_extremity.group(2)
+
+            content.append('-%s' % gene) if orientation == 'h' else content.append('%s' % gene)
+
+            other_extremity = "%s%s" % (gene, extremities[orientation])
+
+            if other_extremity in telomere:
+                telomere.remove(other_extremity)
             try:
-                adjacencies.pop(current_gene)
+                adjacencies.pop(current_adjacency)
             except KeyError:
                 pass
 
-            single_extremity = re.search('([\d*]+)([t|h])', current_gene)
-            orientation = single_extremity.group(2)
-            gene = single_extremity.group(1)
-            if orientation == 'h':
-                content.append('-%s' % (gene))
-            else:
-                content.append('%s' % (gene))
-            other_extremity = "%s%s" % (gene,extremities[orientation])
-
             try:
-                current_gene = adjacencies[other_extremity]
+                current_adjacency = adjacencies[other_extremity]
                 adjacencies.pop(other_extremity)
             except KeyError:
-                break
+                current_adjacency = None
+                content.append('$') if linear else content.append(')')
+
+            #if orientation == 'h':
+            #    content.append('-%s' % gene)
+            #else:
+            #    content.append('%s' % gene)
+
+
+
+
+        #while adjacencies:
+        #    try:
+        #        adjacencies.pop(current_gene)
+        #    except KeyError:
+        #        pass
+
+        #    single_extremity = re.search('([\d*]+)([t|h])', current_gene)
+        #    orientation = single_extremity.group(2)
+        #    gene = single_extremity.group(1)
+        #    if orientation == 'h':
+        #        content.append('-%s' % (gene))
+        #    else:
+        #        content.append('%s' % (gene))
+        #    other_extremity = "%s%s" % (gene,extremities[orientation])
+
+        #    try:
+        #        current_gene = adjacencies[other_extremity]
+        #        adjacencies.pop(other_extremity)
+        #    except KeyError:
+
+        #        if current_gene in telomere:
+        #            telomere.remove(current_gene)
+
+        #        content.append('$') if linear else content.append(')')
+        #        if telomere:
+        #            current_gene = telomere[0]
+        #            telomere.remove(current_gene)
+        #            linear = True
+        #            continue
+        #        if adjacencies:
+        #            linear = False
+        #            current_gene = adjacencies.keys()[0]
+        #            continue
 
         return Genome(name, content)
