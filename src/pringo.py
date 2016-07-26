@@ -32,7 +32,6 @@ potential_ancestors = {}
 # main iteration
 #TODO: Do a while-loop, pop the first element and update the list with the next (resolved) level in the tree.
 for pair in pairwise_genomes:
-    print pair
     first_content = input.genomes[pair[0]]
     second_content = input.genomes[pair[1]]
 
@@ -54,22 +53,9 @@ for pair in pairwise_genomes:
 
     # Create the circular breakpoint graph of the two genomes
     inter_info.create_circular_graph()
-    # Find all intermediate genomes
-    #inter_info.get_all_inter_adj()
-    # Create binary vector
-    #binary_of_first = first_genome.create_binary_vector(inter_info.inter_adj)
-    #binary_of_second = second_genome.create_binary_vector(inter_info.inter_adj)
-    #binaries = {pair[0]:binary_of_first, pair[1]:binary_of_second}
-    # Update everything
 
+    # Sample genomes from the breakpoint graph
     sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 100).sampled_genomes
-
-    #sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 10, len(first_genome.adjacency_set)).sampled_genomes
-
-    #Genome.genome_from_adjacencies("s1", sampled_genomes[0])
-
+    # Update potential ancestors with all sampled genomes
     potential_ancestors.update({(pair[0], pair[1]): (inter_info.circular_breakpoint, sampled_genomes)})
 
-for key,value in potential_ancestors.items():
-    print key
-    print [len(x.content) for x in value[1]], [x.chr_number() for x in value[1]]#, [x.content for x in value[1]]

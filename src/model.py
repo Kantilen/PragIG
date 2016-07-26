@@ -77,7 +77,6 @@ class Genome():
                     current_chromosome.remove(first)
                     current_chromosome.remove(last)
                 except IndexError:
-                    print self.content
                     print index
                     print self.content[index-5:index+5]
 
@@ -149,22 +148,28 @@ class Genome():
             adjacencies.update({adjacency.first_ex : adjacency.second_ex, adjacency.second_ex : adjacency.first_ex})
 
         current_adjacency = None
-        linear = False
+        #linear = False
 
         while adjacencies:
+            #print telomere
+            #print adjacencies
+
             if not current_adjacency:
                 if telomere:
                     current_adjacency = telomere[0]
                     telomere.remove(current_adjacency)
-                    linear = True
+                    #linear = True
                 else:
                     current_adjacency = adjacencies.keys()[0]
-                    linear = False
+                    #linear = False
 
             try:
                 adjacencies.pop(current_adjacency)
             except KeyError:
-                pass
+                content.append(')')
+                current_adjacency = None
+                continue
+
 
             single_extremity = re.search('([\d*]+)([t|h])', current_adjacency)
             gene = single_extremity.group(1)
@@ -181,15 +186,16 @@ class Genome():
                 current_adjacency = None
                 continue
 
+            current_adjacency = adjacencies[other_extremity]
             try:
-                current_adjacency = adjacencies[other_extremity]
                 adjacencies.pop(other_extremity)
             except KeyError:
                 current_adjacency = None
                 content.append(')')
+            #print content
 
 
-        content.append('$') if linear else content.append(')')
+        #content.append('$') if linear else content.append(')')
 
             #if orientation == 'h':
             #    content.append('-%s' % gene)
