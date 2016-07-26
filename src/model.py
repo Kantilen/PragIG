@@ -71,10 +71,15 @@ class Genome():
         for index, gene in enumerate(self.content):
             if not (re.match('[\d*\w*]+', gene) or gene.startswith('-')):  # chromosome sign detected
                 # the first_content and last extremity have to be considered separately
-                first = current_chromosome[0]
-                last = current_chromosome[-1]
-                current_chromosome.remove(first)
-                current_chromosome.remove(last)
+                try:
+                    first = current_chromosome[0]
+                    last = current_chromosome[-1]
+                    current_chromosome.remove(first)
+                    current_chromosome.remove(last)
+                except IndexError:
+                    print self.content
+                    print index
+                    print self.content[index-5:index+5]
 
                 # connecting graph
                 current_chromosome = iter(current_chromosome)
@@ -133,10 +138,6 @@ class Genome():
         content = []
 
         for adjacency in adjacency_set:
-        #    if adjacency.first_ex in adjacencies.keys():
-        #        print adjacency, adjacencies[adjacency.first_ex]
-        #    if adjacency.second_ex in adjacencies.keys():
-        #        print adjacency, adjacencies[adjacency.second_ex]
             if adjacency.second_ex.startswith('Telo'):
                 telomere.append(adjacency.first_ex)
                 adjacencies.update({adjacency.first_ex : None})
@@ -147,13 +148,10 @@ class Genome():
                 continue
             adjacencies.update({adjacency.first_ex : adjacency.second_ex, adjacency.second_ex : adjacency.first_ex})
 
-        #print adjacencies
-        #print telomere
         current_adjacency = None
         linear = False
 
         while adjacencies:
-
             if not current_adjacency:
                 if telomere:
                     current_adjacency = telomere[0]
@@ -162,7 +160,11 @@ class Genome():
                 else:
                     current_adjacency = adjacencies.keys()[0]
                     linear = False
+
+            try:
                 adjacencies.pop(current_adjacency)
+            except KeyError:
+                pass
 
             single_extremity = re.search('([\d*]+)([t|h])', current_adjacency)
             gene = single_extremity.group(1)
@@ -174,17 +176,20 @@ class Genome():
 
             if other_extremity in telomere:
                 telomere.remove(other_extremity)
-            try:
-                adjacencies.pop(current_adjacency)
-            except KeyError:
-                pass
+                adjacencies.pop(other_extremity)
+                content.append('$')
+                current_adjacency = None
+                continue
 
             try:
                 current_adjacency = adjacencies[other_extremity]
                 adjacencies.pop(other_extremity)
             except KeyError:
                 current_adjacency = None
-                content.append('$') if linear else content.append(')')
+                content.append(')')
+
+
+        content.append('$') if linear else content.append(')')
 
             #if orientation == 'h':
             #    content.append('-%s' % gene)
