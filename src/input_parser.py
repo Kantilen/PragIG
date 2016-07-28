@@ -42,7 +42,8 @@ class Input:
         :param tree: Path to the NEWICK tree
         :return: Some BioPython Object containing information of the tree.
         '''
-        return Phylo.read(tree, 'newick')
+        newick_tree = Phylo.read(tree, 'newick')
+        return (newick_tree, max(newick_tree.depths().values()))
 
 
     def read_genomes(self, genomes):
@@ -93,5 +94,7 @@ class Input:
             if clade.count_terminals() == 2:
                 leaves = clade.find_clades()
                 leaves = [x.name for x in leaves if x.name]
-                pairwise_genomes.append(leaves)
+                distances_to_ancestor = [clade.distance(leaves[0],clade), clade.distance(leaves[1],clade)]
+                pairwise_genomes.append((leaves,distances_to_ancestor))
         return pairwise_genomes
+

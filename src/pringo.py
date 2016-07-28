@@ -10,6 +10,7 @@ from input_parser import Input
 from genome_sampler import Genome_Sampler
 from model import Genome
 from ig_info import Intermediate_Genome as IG
+import calculate_probability
 #################################
 
 
@@ -25,20 +26,25 @@ arguments = parser.parse_args()
 # Genome content and tree file are read
 input = Input(arguments.G, arguments.T)
 # Get all pairwise 'siblings' in the tree
-pairwise_genomes = input.find_pairwise_leaves(input.tree)
+
+pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
+max_length = int(input.tree[1])
 
 potential_ancestors = {}
+
+calculate_probability.preprocess_transitions(max_length, 1000)
 
 # main iteration
 #TODO: Do a while-loop, pop the first element and update the list with the next (resolved) level in the tree.
 for pair in pairwise_genomes:
-    first_content = input.genomes[pair[0]]
-    second_content = input.genomes[pair[1]]
-
+    names = pair[0]
+    distances = pair[1]
+    first_content = input.genomes[names[0]]
+    second_content = input.genomes[names[1]]
 
     # Create instance of Intermediate_Genome with the two current sibling-genomes.
-    first_genome = Genome(pair[0], first_content)
-    second_genome = Genome(pair[1], second_content)
+    first_genome = Genome(names[0], first_content)
+    second_genome = Genome(names[1], second_content)
 
     inter_info = IG(first_genome, second_genome)
 
@@ -55,7 +61,19 @@ for pair in pairwise_genomes:
     inter_info.create_circular_graph()
 
     # Sample genomes from the breakpoint graph
-    sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 100).sampled_genomes
-    # Update potential ancestors with all sampled genomes
-    potential_ancestors.update({(pair[0], pair[1]): (inter_info.circular_breakpoint, sampled_genomes)})
+    sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 1000).sampled_genomes
 
+    extant_adjacencies = set(first_genome.adjacency_set).union(set(second_genome.adjacency_set))
+
+    probabilities = {}
+
+    for pot_ancestor in sampled_genomes:
+        ancestral_adjacencies = list(extant_adjacencies.union(pot_ancestor.adjacency_set))
+        first_binary = first_genome.create_binary_vector(ancestral_adjacencies)
+        second_binary = second_genome.create_binary_vector(ancestral_adjacencies)
+        ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies)
+
+        prob = calculate_probability.calculate_probability(first_binary, second_binary, ancestor_binary, distances)
+        probabilities.update({prob:pot_ancestor})
+    ancestor = probabilities[max(probabilities.keys())]
+    print ancestor.content

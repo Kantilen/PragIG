@@ -110,10 +110,10 @@ class Genome():
         '''
         preprocessing_dict = dict.fromkeys(self.adjacency_set)  # This makes O(k+n) instead of O(k*n)!
         binary = np.zeros([1, len(inter_adj)], dtype=int)
-
-        for index, int_adj in enumerate(inter_adj):
-            if int_adj in preprocessing_dict:
-                np.put(binary, index, 1)
+        binary = [1 if adj in preprocessing_dict else 0 for adj in inter_adj]
+        #for index, int_adj in enumerate(inter_adj):
+        #    if int_adj in preprocessing_dict:
+        #        np.put(binary, index, 1)
         return binary
 
     def length(self):
@@ -148,20 +148,14 @@ class Genome():
             adjacencies.update({adjacency.first_ex : adjacency.second_ex, adjacency.second_ex : adjacency.first_ex})
 
         current_adjacency = None
-        #linear = False
 
         while adjacencies:
-            #print telomere
-            #print adjacencies
-
             if not current_adjacency:
                 if telomere:
                     current_adjacency = telomere[0]
                     telomere.remove(current_adjacency)
-                    #linear = True
                 else:
                     current_adjacency = adjacencies.keys()[0]
-                    #linear = False
 
             try:
                 adjacencies.pop(current_adjacency)
@@ -187,56 +181,10 @@ class Genome():
                 continue
 
             current_adjacency = adjacencies[other_extremity]
-            try:
-                adjacencies.pop(other_extremity)
-            except KeyError:
-                current_adjacency = None
-                content.append(')')
-            #print content
-
-
-        #content.append('$') if linear else content.append(')')
-
-            #if orientation == 'h':
-            #    content.append('-%s' % gene)
-            #else:
-            #    content.append('%s' % gene)
-
-
-
-
-        #while adjacencies:
-        #    try:
-        #        adjacencies.pop(current_gene)
-        #    except KeyError:
-        #        pass
-
-        #    single_extremity = re.search('([\d*]+)([t|h])', current_gene)
-        #    orientation = single_extremity.group(2)
-        #    gene = single_extremity.group(1)
-        #    if orientation == 'h':
-        #        content.append('-%s' % (gene))
-        #    else:
-        #        content.append('%s' % (gene))
-        #    other_extremity = "%s%s" % (gene,extremities[orientation])
-
-        #    try:
-        #        current_gene = adjacencies[other_extremity]
-        #        adjacencies.pop(other_extremity)
-        #    except KeyError:
-
-        #        if current_gene in telomere:
-        #            telomere.remove(current_gene)
-
-        #        content.append('$') if linear else content.append(')')
-        #        if telomere:
-        #            current_gene = telomere[0]
-        #            telomere.remove(current_gene)
-        #            linear = True
-        #            continue
-        #        if adjacencies:
-        #            linear = False
-        #            current_gene = adjacencies.keys()[0]
-        #            continue
+#            try:
+            adjacencies.pop(other_extremity)
+ #           except KeyError:
+  #              current_adjacency = None
+   #             content.append(')')
 
         return Genome(name, content)
