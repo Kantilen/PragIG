@@ -47,8 +47,8 @@ class Intermediate_Genome():
         :return: Boolean variable
         '''
         # remove signs and chromosomes
-        first_genome = [re.sub('-', '', x) for x in self.genomeA]
-        second_genome = [re.sub('-', '', x) for x in self.genomeB]
+        first_genome = [re.sub('-', '', x) for x in self.genomeA if x != ')' and x != '$']
+        second_genome = [re.sub('-', '', x) for x in self.genomeB if x != ')' and x != '$']
 
         # symmetrical difference. Just take elements that are unique in one
         # of the sets
