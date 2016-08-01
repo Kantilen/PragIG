@@ -166,16 +166,9 @@ class Genome():
                 current_adjacency = None
                 continue
 
-            try:
-                single_extremity = re.search('([\d*]+)([t|h])', current_adjacency)
-                gene = single_extremity.group(1)
-                orientation = single_extremity.group(2)
-            except AttributeError:
-                print current_adjacency
-                print adjacencies
-                print telomere
-                print adjacency_set
-                sys.exit(1)
+            single_extremity = re.search('([\d*]+)([t|h])', current_adjacency)
+            gene = single_extremity.group(1)
+            orientation = single_extremity.group(2)
 
             content.append('-%s' % gene) if orientation == 'h' else content.append('%s' % gene)
 

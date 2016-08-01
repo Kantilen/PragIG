@@ -42,17 +42,17 @@ class Genome_Sampler():
             cycle = []
             for component in nx.connected_component_subgraphs(self.graph):
 
-                enumerated_vertices = {}
+               enumerated_vertices = {}
 
-                first_adj = component.edges()[0]
-                long_path = [x for x in nx.all_simple_paths(component, first_adj[0], first_adj[1])][-1]
-                # assign value for each vertex from 0 to n
-                for index, vertex in enumerate(long_path):
-                    enumerated_vertices[index] = vertex
+               first_adj = component.edges()[0]
+               long_path = [x for x in nx.all_simple_paths(component, first_adj[0], first_adj[1])][-1]
+               # assign value for each vertex from 0 to n
+               for index, vertex in enumerate(long_path):
+                   enumerated_vertices[index] = vertex
 
-                cycle.append(self.create_adjacency_from_cycle(enumerated_vertices.values()))
+               cycle.append(self.create_adjacency_from_cycle(enumerated_vertices.values()))
             cycle = [x for y in cycle for x in y]
-            self.sampled_genomes.append(model.Genome.genome_from_adjacencies(i,cycle))
+            self.sampled_genomes.append(model.Genome.genome_from_adjacencies('',cycle))
 
 
 

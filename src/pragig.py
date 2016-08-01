@@ -5,6 +5,7 @@
 #################################
 import argparse as args
 import sys
+from collections import Counter
 
 from input_parser import Input
 from genome_sampler import Genome_Sampler
@@ -20,6 +21,8 @@ __author__ = 'klamkiewicz'
 parser = args.ArgumentParser(description="Enter two genomes in the input format of Unimog")
 parser.add_argument('G', metavar='GENOMES', type=str, help="Path to the file that contains the information of extant genomes")
 parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that contains the NEWICK tree")
+parser.add_argument('-r', '--repetition', default=100, type=int, help="Number of sampled genomes for each ancestor, default: 100")
+
 
 arguments = parser.parse_args()
 
@@ -32,13 +35,13 @@ max_length = int(input.tree[1])
 
 potential_ancestors = {}
 
+#TODO: The 1000 is the number of genes in the genomes. This is hard-coded atm!
 calculate_probability.preprocess_transitions(max_length, 1000)
 
 # main iteration
-#TODO: Do a while-loop, pop the first element and update the list with the next (resolved) level in the tree.
+
 while pairwise_genomes:
     pair = pairwise_genomes.pop()
-#for pair in pairwise_genomes:
     names = pair[0]
     distances = pair[1]
     first_content = input.genomes[names[0]]
@@ -61,11 +64,16 @@ while pairwise_genomes:
 
     # Create the circular breakpoint graph of the two genomes
     inter_info.create_circular_graph()
-
+    highest_prob = 0.0
+    extant_adjacencies = set(first_genome.adjacency_set).union(set(second_genome.adjacency_set))
+    #ancestor = None
     # Sample genomes from the breakpoint graph
+    #for i in range(arguments.repetition):
+        #print i
+    #    pot_ancestor = Genome_Sampler(inter_info.circular_breakpoint).sampled_genomes
+
     sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 100).sampled_genomes
 
-    extant_adjacencies = set(first_genome.adjacency_set).union(set(second_genome.adjacency_set))
 
     probabilities = {}
 
@@ -76,9 +84,14 @@ while pairwise_genomes:
         ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies)
 
         prob = calculate_probability.calculate_probability(first_binary, second_binary, ancestor_binary, distances)
+        #prob = calculate_probability.calculate_probability(first_binary, first_binary, first_binary, [1,1])
+        #if prob > highest_prob:
+        #    highest_prob = prob
+        #    ancestor = pot_ancestor
         probabilities.update({prob:pot_ancestor})
 
     ancestor = probabilities[max(probabilities.keys())]
+
     ancestor.name = "%s%s" % (names[0], names[1])
 
     clade = input.tree[0].common_ancestor(names[0],names[1])
@@ -88,5 +101,6 @@ while pairwise_genomes:
 
     input.genomes.update({ancestor.name:ancestor.content})
     print ancestor.content
+    print max(probabilities.keys()),
     print ancestor.name
     pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
