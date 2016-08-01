@@ -88,4 +88,5 @@ while pairwise_genomes:
 
     input.genomes.update({ancestor.name:ancestor.content})
     print ancestor.content
+    print ancestor.name
     pairwise_genomes = input.find_pairwise_leaves(input.tree[0])

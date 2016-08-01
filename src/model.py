@@ -137,6 +137,8 @@ class Genome():
         content = []
 
         for adjacency in adjacency_set:
+            if adjacency.first_ex.startswith('Telo') and adjacency.second_ex.startswith('Telo'):
+                continue
             if adjacency.second_ex.startswith('Telo'):
                 telomere.append(adjacency.first_ex)
                 adjacencies.update({adjacency.first_ex : None})
@@ -164,10 +166,16 @@ class Genome():
                 current_adjacency = None
                 continue
 
-
-            single_extremity = re.search('([\d*]+)([t|h])', current_adjacency)
-            gene = single_extremity.group(1)
-            orientation = single_extremity.group(2)
+            try:
+                single_extremity = re.search('([\d*]+)([t|h])', current_adjacency)
+                gene = single_extremity.group(1)
+                orientation = single_extremity.group(2)
+            except AttributeError:
+                print current_adjacency
+                print adjacencies
+                print telomere
+                print adjacency_set
+                sys.exit(1)
 
             content.append('-%s' % gene) if orientation == 'h' else content.append('%s' % gene)
 
