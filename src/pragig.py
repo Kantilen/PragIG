@@ -64,33 +64,42 @@ while pairwise_genomes:
 
     # Create the circular breakpoint graph of the two genomes
     inter_info.create_circular_graph()
-    highest_prob = 0.0
+    highest_prob = -1000000000000000000000000000000000000000
     extant_adjacencies = set(first_genome.adjacency_set).union(set(second_genome.adjacency_set))
-    #ancestor = None
+
+    ancestor = None
+    print distances
+    if distances[0] == 0.0:
+        ancestor = first_genome
+        print "HELLO1"
+    elif distances[1] == 0.0:
+        ancestor = second_genome
+        print "HELLO2"
+    else:
     # Sample genomes from the breakpoint graph
-    #for i in range(arguments.repetition):
+        for i in range(arguments.repetition):
         #print i
-    #    pot_ancestor = Genome_Sampler(inter_info.circular_breakpoint).sampled_genomes
+            pot_ancestor = Genome_Sampler(inter_info.circular_breakpoint).sampled_genomes
 
-    sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 100).sampled_genomes
+        #sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 100).sampled_genomes
 
 
-    probabilities = {}
+    #probabilities = {}
 
-    for pot_ancestor in sampled_genomes:
-        ancestral_adjacencies = list(extant_adjacencies.union(pot_ancestor.adjacency_set))
-        first_binary = first_genome.create_binary_vector(ancestral_adjacencies)
-        second_binary = second_genome.create_binary_vector(ancestral_adjacencies)
-        ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies)
+    #for pot_ancestor in sampled_genomes:
+            ancestral_adjacencies = list(extant_adjacencies.union(pot_ancestor.adjacency_set))
+            first_binary = first_genome.create_binary_vector(ancestral_adjacencies)
+            second_binary = second_genome.create_binary_vector(ancestral_adjacencies)
+            ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies)
 
-        prob = calculate_probability.calculate_probability(first_binary, second_binary, ancestor_binary, distances)
-        #prob = calculate_probability.calculate_probability(first_binary, first_binary, first_binary, [1,1])
-        #if prob > highest_prob:
-        #    highest_prob = prob
-        #    ancestor = pot_ancestor
-        probabilities.update({prob:pot_ancestor})
+            prob = calculate_probability.calculate_probability(first_binary, second_binary, ancestor_binary, distances)
 
-    ancestor = probabilities[max(probabilities.keys())]
+            if prob > highest_prob:
+                highest_prob = prob
+                ancestor = pot_ancestor
+        #probabilities.update({prob:pot_ancestor})
+
+    #ancestor = probabilities[max(probabilities.keys())]
 
     ancestor.name = "%s%s" % (names[0], names[1])
 
@@ -100,7 +109,7 @@ while pairwise_genomes:
     input.tree[0].collapse(names[1])
 
     input.genomes.update({ancestor.name:ancestor.content})
-    print ancestor.content
-    print max(probabilities.keys()),
-    print ancestor.name
     pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
+    print pairwise_genomes
+    print ancestor.name
+    print ancestor.content

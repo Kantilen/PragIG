@@ -46,6 +46,6 @@ def calculate_probability(first, second, ancestral, distances):
         try:
             prob += math.log(transition_length[(first[index],element)][distances[0]])+math.log(transition_length[second[index],element][distances[1]])
         except ValueError:
-            prob = None
+            #prob = None
             break
     return prob

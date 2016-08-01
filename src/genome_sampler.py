@@ -17,8 +17,8 @@ class Genome_Sampler():
     This class generates sampled genomes from the given data.
     It returns a list of potential ancestral genomes.
     '''
-    def __init__(self, graph, iter):
-        self.iteration = iter
+    def __init__(self, graph):
+        #self.iteration = iter
 
         self.graph = graph
         #self.conflicting_adjacencies = defaultdict(set)
@@ -38,7 +38,7 @@ class Genome_Sampler():
 
     def enumerate_vertices(self):
 
-        for i in range(self.iteration):
+        #for i in range(self.iteration):
             cycle = []
             for component in nx.connected_component_subgraphs(self.graph):
 
@@ -52,7 +52,7 @@ class Genome_Sampler():
 
                cycle.append(self.create_adjacency_from_cycle(enumerated_vertices.values()))
             cycle = [x for y in cycle for x in y]
-            self.sampled_genomes.append(model.Genome.genome_from_adjacencies('',cycle))
+            self.sampled_genomes=(model.Genome.genome_from_adjacencies('',cycle))
 
 
 
