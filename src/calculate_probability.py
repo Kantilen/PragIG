@@ -22,11 +22,14 @@ def preprocess_transitions(length, size):
     # 1 -> 1
     prob_keep_adj = 1 - prob_cut_adj
 
-    probabilities = [{1:prob_form_adj}, {1:prob_avoid_adj}, {1:prob_cut_adj}, {1:prob_keep_adj}]
+    probabilities = [{0:0, 1:prob_form_adj}, {0:1, 1:prob_avoid_adj}, {0:0, 1:prob_cut_adj}, {0:1, 1:prob_keep_adj}]
     first_transition_probabilities = dict(zip(identifier,probabilities))
 
     transition_length.update(dynamic_table(length, first_transition_probabilities))
-
+    #for key, value in transition_length.items():
+    #    print key
+    #    print value
+    #sys.exit(0)
 
 def dynamic_table(length, transitions):
     for index in range(2,length+1):
