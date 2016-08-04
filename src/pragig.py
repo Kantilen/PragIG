@@ -22,6 +22,7 @@ parser = args.ArgumentParser(description="Enter two genomes in the input format 
 parser.add_argument('G', metavar='GENOMES', type=str, help="Path to the file that contains the information of extant genomes")
 parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that contains the NEWICK tree")
 parser.add_argument('-r', '--repetition', default=100, type=int, help="Number of sampled genomes for each ancestor, default: 100")
+parser.add_argument('-o', '--output_file', type=str, help="If defined, output is saved in the given file")
 
 
 arguments = parser.parse_args()
@@ -68,13 +69,11 @@ while pairwise_genomes:
     extant_adjacencies = set(first_genome.adjacency_set).union(set(second_genome.adjacency_set))
 
     ancestor = None
-    print distances
+
     if distances[0] == 0.0:
         ancestor = first_genome
-        print "HELLO1"
     elif distances[1] == 0.0:
         ancestor = second_genome
-        print "HELLO2"
     else:
     # Sample genomes from the breakpoint graph
         for i in range(arguments.repetition):
@@ -110,6 +109,32 @@ while pairwise_genomes:
 
     input.genomes.update({ancestor.name:ancestor.content})
     pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
-    print pairwise_genomes
-    print ancestor.name
-    print ancestor.content
+
+if arguments.output_file:
+    output = open(arguments.output_file, 'w')
+
+for result_name, result_content in input.genomes.items():
+    result = Genome(result_name,result_content)
+    chromosome = result.chr_number()
+
+    if not arguments.output_file:
+        print '>',result_name
+    else:
+        output.write('>%s\n' % (result_name))
+    for i in range(chromosome):
+        if not arguments.output_file:
+            print '# chr%d' % (i+1)
+        else:
+            output.write('#chr%d\n' % (i + 1))
+        for index, gene in enumerate(result_content):
+            if not arguments.output_file:
+                print gene,
+            else:
+                output.write("%s " % (gene))
+            if gene == ')' or gene == '$':
+                result_content = result_content[index+1:]
+                if not arguments.output_file:
+                    print
+                else:
+                    output.write('\n')
+                break
