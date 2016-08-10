@@ -25,8 +25,8 @@ def preprocess_transitions(length, size):
 
     # The "0-step" is included for crazy 0-length edges in input trees
     # a change in no step can't occur, therefore only staying in the same state is possible
-    probabilities = [{0:0, 1:prob_form_adj}, {0:1, 1:prob_avoid_adj}, {0:0, 1:prob_cut_adj}, {0:1, 1:prob_keep_adj}]
-    #probabilities = [{1: prob_form_adj}, {1: prob_avoid_adj}, {1: prob_cut_adj}, {1: prob_keep_adj}]
+    #probabilities = [{0:0, 1:prob_form_adj}, {0:1, 1:prob_avoid_adj}, {0:0, 1:prob_cut_adj}, {0:1, 1:prob_keep_adj}]
+    probabilities = [{1: prob_form_adj}, {1: prob_avoid_adj}, {1: prob_cut_adj}, {1: prob_keep_adj}]
     first_transition_probabilities = dict(zip(identifier,probabilities))
 
     transition_length.update(dynamic_table(length, first_transition_probabilities))
@@ -35,8 +35,7 @@ def dynamic_table(length, transitions):
     for index in range(2,length+1):
         for event in transitions.keys():
             i,j = event
-            transitions[event][index] = max([transitions[(i,0)][index-1]*transitions[(0,j)][1],
-                                            transitions[(i,1)][index-1]*transitions[(1,j)][1]])
+            transitions[event][index] = (transitions[(i,0)][index-1]*transitions[(0,j)][1] + transitions[(i,1)][index-1]*transitions[(1,j)][1])
     return transitions
 
 
