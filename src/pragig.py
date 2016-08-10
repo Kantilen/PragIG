@@ -37,8 +37,8 @@ max_length = int(input.tree[1])
 potential_ancestors = {}
 
 #TODO: The 1000 is the number of genes in the genomes. This is hard-coded atm!
-calculate_probability.preprocess_transitions(max_length, 1000)
-
+calculate_probability.preprocess_transitions(2*max_length, 1000)
+#sys.exit(0)
 # main iteration
 
 while pairwise_genomes:
@@ -65,7 +65,7 @@ while pairwise_genomes:
 
     # Create the circular breakpoint graph of the two genomes
     inter_info.create_circular_graph()
-    highest_prob = -1000000000000000000000000000000000000000
+    highest_prob = None
     extant_adjacencies = set(first_genome.adjacency_set).union(set(second_genome.adjacency_set))
 
     ancestor = None
