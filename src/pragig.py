@@ -87,9 +87,9 @@ while pairwise_genomes:
 
     #for pot_ancestor in sampled_genomes:
             ancestral_adjacencies = list(extant_adjacencies.union(pot_ancestor.adjacency_set))
-            first_binary = first_genome.create_binary_vector(ancestral_adjacencies)
-            second_binary = second_genome.create_binary_vector(ancestral_adjacencies)
-            ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies)
+            first_binary = first_genome.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+            second_binary = second_genome.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+            ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
 
             prob = calculate_probability.calculate_probability(first_binary, second_binary, ancestor_binary, distances)
 

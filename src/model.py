@@ -8,6 +8,7 @@ __author__ = 'klamkiewicz'
 import re
 import numpy as np
 from collections import Counter
+import networkx as nx
 import sys
 #################################
 
@@ -103,14 +104,15 @@ class Genome():
 
         return adjacencies
 
-    def create_binary_vector(self, inter_adj):
+    def create_binary_vector(self, inter_adj, breakpoint_graph):
         '''
         This function creates an numpy array that represents the binary vector of
         graph in the two genomes that have to compared.
         '''
         preprocessing_dict = dict.fromkeys(self.adjacency_set)  # This makes O(k+n) instead of O(k*n)!
-        binary = np.zeros([1, len(inter_adj)], dtype=int)
-        binary = [1 if adj in preprocessing_dict else 0 for adj in inter_adj]
+        binaries = []
+        for component in nx.connected_component_subgraphs(breakpoint_graph):
+            binary = [1 if adj in preprocessing_dict else 0 for adj in inter_adj]
         #for index, int_adj in enumerate(inter_adj):
         #    if int_adj in preprocessing_dict:
         #        np.put(binary, index, 1)
