@@ -99,7 +99,7 @@ while pairwise_genomes:
 
             binaries = {}
             for genome in all_genomes.items():
-                binaries[genome[0]] = genome[1].create_binary_vector(ancestral_adjacencies, inter_info)
+                binaries[genome[0]] = genome[1].create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
 
             ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
 

@@ -105,10 +105,10 @@ class Genome():
         return adjacencies
 
     def create_binary_vector(self, inter_adj, breakpoint_graph):
-        '''
+        """
         This function creates an numpy array that represents the binary vector of
         graph in the two genomes that have to compared.
-        '''
+        """
         preprocessing_dict = dict.fromkeys(self.adjacency_set)  # This makes O(k+n) instead of O(k*n)!
         binaries = []
         #for component in nx.connected_component_subgraphs(breakpoint_graph):
@@ -116,7 +116,29 @@ class Genome():
         #for index, int_adj in enumerate(inter_adj):
         #    if int_adj in preprocessing_dict:
         #        np.put(binary, index, 1)
-        return binary
+
+        for component in nx.connected_component_subgraphs(breakpoint_graph):
+            all_adj = self.adjacencies_from_comp(component)
+            one_comp_binary = [1 if adj in preprocessing_dict else 0 for adj in all_adj]
+            binaries.append(one_comp_binary)
+
+        #print binaries
+        return binaries
+
+    def adjacencies_from_comp(self,comp):
+        enumerated_vertices = {}
+
+        first_adj = comp.edges()[0]
+        long_path = [x for x in nx.all_simple_paths(comp, first_adj[0], first_adj[1])][-1]
+        # assign value for each vertex from 0 to n
+        for index, vertex in enumerate(long_path):
+            enumerated_vertices[index] = vertex
+
+        all_adj = []
+        for i in range(len(enumerated_vertices)):
+            all_adj.extend([Adjacency(enumerated_vertices[i],enumerated_vertices[j]) for j in range(i,len(enumerated_vertices)) if ((j-i)%2 != 0)])
+
+        return all_adj
 
     def length(self):
         return len(self.content)
