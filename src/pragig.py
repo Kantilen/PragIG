@@ -101,13 +101,9 @@ while pairwise_genomes:
             for genome in all_genomes.items():
                 binaries[genome[0]] = genome[1].create_binary_vector(ancestral_adjacencies, inter_info)
 
-            #first_binary = first_genome.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
-            #second_binary = second_genome.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
             ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
 
-            #prob = calculate_probability.calculate_probability(first_binary, second_binary, ancestor_binary, distances)
-
-            prob = calculate_probability.calculate_probability(binaries[names[0]], binaries[names[1]], ancestor_binary, [distances[names[0]], distances[names[1]]])
+            prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
 
             if prob > highest_prob:
                 highest_prob = prob
@@ -122,7 +118,7 @@ while pairwise_genomes:
     all_genomes.pop(names[0])
     all_genomes.pop(names[1])
     input.genomes.update({ancestor.name:ancestor.content})
-    all_genomes[ancestor.name] = Genome(ancestor.name,ancestor.content)
+    all_genomes[ancestor.name] = ancestor
     pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
 
 ###############################################################################################
