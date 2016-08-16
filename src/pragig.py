@@ -14,7 +14,6 @@ from ig_info import Intermediate_Genome as IG
 import calculate_probability
 #################################
 
-
 __author__ = 'klamkiewicz'
 
 # Commandline arguments
@@ -32,25 +31,41 @@ input = Input(arguments.G, arguments.T)
 # Get all pairwise 'siblings' in the tree
 
 pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
+all_leaves = input.find_all_leaves(input.tree[0])
 max_length = int(input.tree[1])
+
+all_genomes = {}
+
+for leaf in all_leaves:
+    all_genomes[leaf.name] = Genome(leaf.name, input.genomes[leaf.name])
+
+gene_number = all_genomes.values()[0].adj_length()
+calculate_probability.preprocess_transitions(2*max_length, gene_number)
 
 potential_ancestors = {}
 
-#TODO: The 1000 is the number of genes in the genomes. This is hard-coded atm!
-calculate_probability.preprocess_transitions(2*max_length, 1000)
-#sys.exit(0)
 # main iteration
-
 while pairwise_genomes:
     pair = pairwise_genomes.pop()
     names = pair[0]
-    distances = pair[1]
-    first_content = input.genomes[names[0]]
-    second_content = input.genomes[names[1]]
+    lca = input.tree[0].common_ancestor(names)
+
+    distances = {}
+    for genome_name in all_genomes.keys():
+        distances[genome_name] = input.tree[0].distance(lca, genome_name)
+
+
+    #distances = pair[1]
+    #first_content = input.genomes[names[0]]
+    #second_content = input.genomes[names[1]]
 
     # Create instance of Intermediate_Genome with the two current sibling-genomes.
-    first_genome = Genome(names[0], first_content)
-    second_genome = Genome(names[1], second_content)
+    #first_genome = Genome(names[0], first_content)
+    #second_genome = Genome(names[1], second_content)
+
+    first_genome = all_genomes[names[0]]
+    second_genome = all_genomes[names[1]]
+
 
     inter_info = IG(first_genome, second_genome)
 
@@ -70,35 +85,33 @@ while pairwise_genomes:
 
     ancestor = None
 
-    if distances[0] == 0.0:
+    if distances[names[0]] == 0.0:
         ancestor = first_genome
-    elif distances[1] == 0.0:
+    elif distances[names[1]] == 0.0:
         ancestor = second_genome
     else:
     # Sample genomes from the breakpoint graph
         for i in range(arguments.repetition):
-        #print i
             pot_ancestor = Genome_Sampler(inter_info.circular_breakpoint).sampled_genomes
-
-        #sampled_genomes = Genome_Sampler(inter_info.circular_breakpoint, 100).sampled_genomes
-
-
-    #probabilities = {}
 
     #for pot_ancestor in sampled_genomes:
             ancestral_adjacencies = list(extant_adjacencies.union(pot_ancestor.adjacency_set))
-            first_binary = first_genome.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
-            second_binary = second_genome.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+
+            binaries = {}
+            for genome in all_genomes.items():
+                binaries[genome[0]] = genome[1].create_binary_vector(ancestral_adjacencies, inter_info)
+
+            #first_binary = first_genome.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+            #second_binary = second_genome.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
             ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
 
-            prob = calculate_probability.calculate_probability(first_binary, second_binary, ancestor_binary, distances)
+            #prob = calculate_probability.calculate_probability(first_binary, second_binary, ancestor_binary, distances)
+
+            prob = calculate_probability.calculate_probability(binaries[names[0]], binaries[names[1]], ancestor_binary, [distances[names[0]], distances[names[1]]])
 
             if prob > highest_prob:
                 highest_prob = prob
                 ancestor = pot_ancestor
-        #probabilities.update({prob:pot_ancestor})
-
-    #ancestor = probabilities[max(probabilities.keys())]
 
     ancestor.name = "%s%s" % (names[0], names[1])
 
@@ -106,9 +119,13 @@ while pairwise_genomes:
     clade.name = ancestor.name
     input.tree[0].collapse(names[0])
     input.tree[0].collapse(names[1])
-
+    all_genomes.pop(names[0])
+    all_genomes.pop(names[1])
     input.genomes.update({ancestor.name:ancestor.content})
+    all_genomes[ancestor.name] = Genome(ancestor.name,ancestor.content)
     pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
+
+###############################################################################################
 
 if arguments.output_file:
     output = open(arguments.output_file, 'w')

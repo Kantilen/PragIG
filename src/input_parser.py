@@ -98,3 +98,5 @@ class Input:
                 pairwise_genomes.append((leaves,distances_to_ancestor))
         return pairwise_genomes
 
+    def find_all_leaves(self, tree):
+        return tree.get_terminals()

@@ -111,8 +111,8 @@ class Genome():
         '''
         preprocessing_dict = dict.fromkeys(self.adjacency_set)  # This makes O(k+n) instead of O(k*n)!
         binaries = []
-        for component in nx.connected_component_subgraphs(breakpoint_graph):
-            binary = [1 if adj in preprocessing_dict else 0 for adj in inter_adj]
+        #for component in nx.connected_component_subgraphs(breakpoint_graph):
+        binary = [1 if adj in preprocessing_dict else 0 for adj in inter_adj]
         #for index, int_adj in enumerate(inter_adj):
         #    if int_adj in preprocessing_dict:
         #        np.put(binary, index, 1)
