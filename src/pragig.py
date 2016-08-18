@@ -105,31 +105,34 @@ while pairwise_genomes:
             highest_candidate = None
             highest_prob = None
 
-            
+            if not len(component.nodes() <= 14):
 
-            for i in range(arguments.repetition):
+                for i in range(arguments.repetition):
 
-                pot_ancestor = Genome_Sampler(component).intermediate_cycle
-                all_adjacencies = list(extant_adjacencies.union(pot_ancestor))
+                    pot_ancestor = Genome_Sampler(component).intermediate_cycle
+                    all_adjacencies = list(extant_adjacencies.union(pot_ancestor))
 
-                binaries = {}
-                for genome in all_genomes.items():
-                    binaries[genome[0]] = genome[1].create_binary_vector(all_adjacencies, inter_info.circular_breakpoint)
+                    binaries = {}
+                    for genome in all_genomes.items():
+                        binaries[genome[0]] = genome[1].create_binary_vector(all_adjacencies, inter_info.circular_breakpoint)
 
                 #print all_adjacencies
                 #print pot_ancestor
 
-                ancestor_binary = [1 if adj in pot_ancestor else 0 for adj in all_adjacencies]
+                    ancestor_binary = [1 if adj in pot_ancestor else 0 for adj in all_adjacencies]
                 #print ancestor_binary
                 #print "\n"
-                prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
+                    prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
 
-                if prob > highest_prob:
-                    highest_prob = prob
-                    highest_candidate = pot_ancestor
+                    if prob > highest_prob:
+                        highest_prob = prob
+                        highest_candidate = pot_ancestor
 
-            ancestor.extend(highest_candidate)
-
+                ancestor.extend(highest_candidate)
+            else:
+                trolo = Genome_Sampler.get_all(component)
+                print trolo
+                sys.exit(0)
         ancestor = Genome.genome_from_adjacencies("", ancestor)
             #print ancestor
 

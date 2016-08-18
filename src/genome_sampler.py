@@ -55,7 +55,16 @@ class Genome_Sampler():
             return cycle
             #self.sampled_genomes=(model.Genome.genome_from_adjacencies('',cycle))
 
-
+    @staticmethod
+    def get_all(component):
+        if not component:
+            return []
+        assert(len(component) % 2 == 0)
+        for k in range(2,len(component)+1,2):
+            adj = [model.Adjacency(component[0],component[k])]
+            for adj_1 in genome_sampler.get_all(component[1,k]):
+                for adj_2 in genome_sampler.get_all(component[k+1:]):
+                    return adj + adj_1 + adj_2
 
     def preprocess_conflicts(self):
         for adj in self.graph:
