@@ -105,34 +105,54 @@ while pairwise_genomes:
             highest_candidate = None
             highest_prob = None
 
-            if not len(component.nodes() <= 14):
+            cycle = []
 
+            enumerated_vertices = {}
+
+            first_adj = component.edges()[0]
+            long_path = [x for x in nx.all_simple_paths(component, first_adj[0], first_adj[1])][-1]
+            # assign value for each vertex from 0 to n
+            for index, vertex in enumerate(long_path):
+                enumerated_vertices[index] = vertex
+
+            if not len(component.nodes()) <= 14:
+                print "SAMPLE"
+                all_IGs = []
                 for i in range(arguments.repetition):
+                    all_IGs.append(Genome_Sampler.create_adjacency_from_cycle(enumerated_vertices.values()))
+            else:
+                print "ALL"
+                print component.nodes()
+                all_IGs = Genome_Sampler.get_all(enumerated_vertices.values())
+                print all_IGs
 
-                    pot_ancestor = Genome_Sampler(component).intermediate_cycle
-                    all_adjacencies = list(extant_adjacencies.union(pot_ancestor))
+            for pot_ancestor in all_IGs:
+                print pot_ancestor
+                    #cycle.append(Genome_Sampler.create_adjacency_from_cycle(enumerated_vertices.values()))
+                    #pot_ancestor = [x for y in cycle for x in y]
+                    #pot_ancestor = Genome_Sampler(component).intermediate_cycle
+                all_adjacencies = list(extant_adjacencies.union(pot_ancestor))
 
-                    binaries = {}
-                    for genome in all_genomes.items():
-                        binaries[genome[0]] = genome[1].create_binary_vector(all_adjacencies, inter_info.circular_breakpoint)
+                binaries = {}
+                for genome in all_genomes.items():
+                    binaries[genome[0]] = genome[1].create_binary_vector(all_adjacencies, inter_info.circular_breakpoint)
 
                 #print all_adjacencies
                 #print pot_ancestor
 
-                    ancestor_binary = [1 if adj in pot_ancestor else 0 for adj in all_adjacencies]
+                ancestor_binary = [1 if adj in pot_ancestor else 0 for adj in all_adjacencies]
                 #print ancestor_binary
                 #print "\n"
-                    prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
+                prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
+                if prob > highest_prob:
+                    highest_prob = prob
+                    highest_candidate = pot_ancestor
 
-                    if prob > highest_prob:
-                        highest_prob = prob
-                        highest_candidate = pot_ancestor
+            ancestor.extend(highest_candidate)
 
-                ancestor.extend(highest_candidate)
-            else:
-                trolo = Genome_Sampler.get_all(component)
-                print trolo
-                sys.exit(0)
+
+#                sys.exit(0)
+
         ancestor = Genome.genome_from_adjacencies("", ancestor)
             #print ancestor
 

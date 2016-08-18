@@ -28,13 +28,15 @@ class Genome_Sampler():
         self.intermediate_cycle = self.enumerate_vertices()
         #print self.create_adjacency_from_cycle(self.graph)
 
-    def create_adjacency_from_cycle(self, cycle):
+    @staticmethod
+    def create_adjacency_from_cycle(cycle):
         if not cycle:
             return []
         assert(len(cycle) % 2 == 0)
 
         adj = random.randint(0, len(cycle)/2 -1) * 2 + 1
-        return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(cycle[0],cycle[adj])] + self.create_adjacency_from_cycle(cycle[adj+1:])
+        return Genome_Sampler.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(cycle[0],cycle[adj])] + \
+               Genome_Sampler.create_adjacency_from_cycle(cycle[adj+1:])
 
     def enumerate_vertices(self):
 
@@ -57,14 +59,24 @@ class Genome_Sampler():
 
     @staticmethod
     def get_all(component):
-        if not component:
-            return []
+        #if not component:
+        #    return []
+        if len(component) == 2:
+            return [model.Adjacency(component[0],component[1])]
+
         assert(len(component) % 2 == 0)
-        for k in range(2,len(component)+1,2):
-            adj = [model.Adjacency(component[0],component[k])]
-            for adj_1 in genome_sampler.get_all(component[1,k]):
-                for adj_2 in genome_sampler.get_all(component[k+1:]):
-                    return adj + adj_1 + adj_2
+        possible = []
+        for k in range(1,len(component),2):
+            adj = model.Adjacency(component[0],component[k])
+            current = []
+            for adj_1 in [Genome_Sampler.get_all(component[1:k])]:
+                #current.extend(adj_1)
+                for adj_2 in [Genome_Sampler.get_all(component[k+1:])]:
+                    #current.extend(adj_2)
+                    print adj, adj_1, adj_2
+                    possible.append(adj)
+                    possible.extend(adj_1 + adj_2)
+        return possible
 
     def preprocess_conflicts(self):
         for adj in self.graph:
