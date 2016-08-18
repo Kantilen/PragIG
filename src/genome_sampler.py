@@ -25,7 +25,7 @@ class Genome_Sampler():
         #self.preprocess_conflicts()
         self.sampled_genomes = []
         #self.create_genomes()
-        self.enumerate_vertices()
+        self.intermediate_cycle = self.enumerate_vertices()
         #print self.create_adjacency_from_cycle(self.graph)
 
     def create_adjacency_from_cycle(self, cycle):
@@ -52,7 +52,8 @@ class Genome_Sampler():
 
                cycle.append(self.create_adjacency_from_cycle(enumerated_vertices.values()))
             cycle = [x for y in cycle for x in y]
-            self.sampled_genomes=(model.Genome.genome_from_adjacencies('',cycle))
+            return cycle
+            #self.sampled_genomes=(model.Genome.genome_from_adjacencies('',cycle))
 
 
 

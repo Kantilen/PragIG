@@ -117,13 +117,13 @@ class Genome():
         #    if int_adj in preprocessing_dict:
         #        np.put(binary, index, 1)
 
-        for component in nx.connected_component_subgraphs(breakpoint_graph):
-            all_adj = self.adjacencies_from_comp(component)
-            one_comp_binary = [1 if adj in preprocessing_dict else 0 for adj in all_adj]
-            binaries.append(one_comp_binary)
+        #for component in nx.connected_component_subgraphs(breakpoint_graph):
+        #    all_adj = self.adjacencies_from_comp(component)
+        #    one_comp_binary = [1 if adj in preprocessing_dict else 0 for adj in all_adj]
+        #    binaries.append(one_comp_binary)
 
         #print binaries
-        return binaries
+        return binary
 
     def adjacencies_from_comp(self,comp):
         enumerated_vertices = {}

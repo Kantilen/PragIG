@@ -37,8 +37,7 @@ def dynamic_table(length, transitions):
 
 def calculate_probability(binaries, ancestral, distances):
     prob = 0.0
-    for component, adjacencies in enumerate(ancestral):
-        for index, element in enumerate(adjacencies):
-            for identifier in binaries.keys():
-                prob += transition_length[(binaries[identifier][component][index],element)][distances[identifier]]
+    for index, element in enumerate(ancestral):
+        for identifier in binaries.keys():
+            prob += transition_length[(binaries[identifier][index],element)][distances[identifier]]
     return prob

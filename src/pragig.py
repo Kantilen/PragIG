@@ -5,11 +5,12 @@
 #################################
 import argparse as args
 import sys
-from collections import Counter
+import networkx as nx
 
 from input_parser import Input
 from genome_sampler import Genome_Sampler
 from model import Genome
+from model import Adjacency
 from ig_info import Intermediate_Genome as IG
 import calculate_probability
 #################################
@@ -80,34 +81,87 @@ while pairwise_genomes:
 
     # Create the circular breakpoint graph of the two genomes
     inter_info.create_circular_graph()
-    highest_prob = None
-    extant_adjacencies = set(first_genome.adjacency_set).union(set(second_genome.adjacency_set))
-
-    ancestor = None
 
     if distances[names[0]] == 0.0:
-        ancestor = first_genome
+       ancestor = first_genome
     elif distances[names[1]] == 0.0:
         ancestor = second_genome
     else:
-    # Sample genomes from the breakpoint graph
-        for i in range(arguments.repetition):
-            pot_ancestor = Genome_Sampler(inter_info.circular_breakpoint).sampled_genomes
+        ancestor = []
 
-    #for pot_ancestor in sampled_genomes:
-            ancestral_adjacencies = list(extant_adjacencies.union(pot_ancestor.adjacency_set))
+        for component in nx.connected_component_subgraphs(inter_info.circular_breakpoint):
+            if len(component.nodes()) == 2:
+                ancestor.append(Adjacency(component.nodes()[0], component.nodes()[1]))
+                continue
 
-            binaries = {}
-            for genome in all_genomes.items():
-                binaries[genome[0]] = genome[1].create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+            adj_set_first_genome = []
+            adj_set_second_genome = []
+            for edge in component.edges():
+                colors = component.get_edge_data(*edge).values()
+                adj_set_first_genome.extend([Adjacency(edge[0],edge[1]) for color in colors if color['color'] == 'A' ])
+                adj_set_second_genome.extend([Adjacency(edge[0], edge[1]) for color in colors if color['color'] == 'B'])
+            extant_adjacencies = set(adj_set_first_genome).union(set(adj_set_second_genome))
 
-            ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+            highest_candidate = None
+            highest_prob = None
 
-            prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
+            
 
-            if prob > highest_prob:
-                highest_prob = prob
-                ancestor = pot_ancestor
+            for i in range(arguments.repetition):
+
+                pot_ancestor = Genome_Sampler(component).intermediate_cycle
+                all_adjacencies = list(extant_adjacencies.union(pot_ancestor))
+
+                binaries = {}
+                for genome in all_genomes.items():
+                    binaries[genome[0]] = genome[1].create_binary_vector(all_adjacencies, inter_info.circular_breakpoint)
+
+                #print all_adjacencies
+                #print pot_ancestor
+
+                ancestor_binary = [1 if adj in pot_ancestor else 0 for adj in all_adjacencies]
+                #print ancestor_binary
+                #print "\n"
+                prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
+
+                if prob > highest_prob:
+                    highest_prob = prob
+                    highest_candidate = pot_ancestor
+
+            ancestor.extend(highest_candidate)
+
+        ancestor = Genome.genome_from_adjacencies("", ancestor)
+            #print ancestor
+
+            #highest_prob = None
+            #extant_adjacencies = set(first_genome.adjacency_set).union(set(second_genome.adjacency_set))
+
+            #ancestor = None
+
+
+            #else:
+            # Sample genomes from the breakpoint graph
+            #    for i in range(arguments.repetition):
+            #        pot_ancestor = Genome_Sampler(inter_info.circular_breakpoint).sampled_genomes
+
+            #for pot_ancestor in sampled_genomes:
+            #ancestral_adjacencies = list(extant_adjacencies.union(pot_ancestor.adjacency_set))
+
+            #binaries = {}
+            #for genome in all_genomes.items():
+            #    binaries[genome[0]] = genome[1].create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+
+            #ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+
+            #prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
+
+            #if prob > highest_prob:
+            #    highest_prob = prob
+            #    ancestor = pot_ancestor
+
+
+
+
 
     ancestor.name = "%s%s" % (names[0], names[1])
 
