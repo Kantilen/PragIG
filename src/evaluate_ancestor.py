@@ -25,9 +25,12 @@ calculated_ancestors = reference.read_genomes(arguments.I)
 leaves = reference.find_pairwise_leaves(reference.tree[0])
 
 
+print "Node;Dist;TP;FP;NP;TP%;FP%;NP%"
+
 while leaves:
     pair = leaves.pop()
     current_leaves = pair[0]
+    distance = pair[1][0] + pair[1][1]
     old_key = reference.tree[0].common_ancestor(current_leaves).name
     content = reference.genomes[old_key]
     new_key = "%s%s" % (current_leaves[0], current_leaves[1])
@@ -37,7 +40,6 @@ while leaves:
 
     genome_reference = Genome("ref", content)
     genome_calculated = Genome("calc", calculated_ancestors[new_key])
-    print new_key
 
     true_positives = sum(1 for adj in genome_calculated.adjacency_set if adj in genome_reference.adjacency_set)
     false_positives = sum(1 for adj in genome_calculated.adjacency_set if not adj in genome_reference.adjacency_set)
@@ -45,8 +47,8 @@ while leaves:
 
     length_reference = genome_reference.adj_length()
 
-    print true_positives, false_positives, false_negatives
-    print float(true_positives)/length_reference, float(false_positives)/length_reference, float(false_negatives)/length_reference, "\n"
+    print "%s;%d;%d;%d;%d;%f;%f;%f" % \
+    (new_key, distance, true_positives, false_positives, false_negatives, float(true_positives)/length_reference, float(false_positives)/length_reference, float(false_negatives)/length_reference)
 
     reference.tree[0].collapse(current_leaves[0])
     reference.tree[0].collapse(current_leaves[1])
