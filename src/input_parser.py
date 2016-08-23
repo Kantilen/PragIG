@@ -93,7 +93,9 @@ class Input:
         for clade in tree.find_clades():
             if clade.count_terminals() == 2:
                 leaves = clade.find_clades()
-                leaves = [x.name for x in leaves if x.name]
+                # NEW THING: if the clade had a name, it is entered here aswell.. Check if the addition works
+                # with the pragig script.
+                leaves = [x.name for x in leaves if x.name and not x == clade]
                 distances_to_ancestor = [clade.distance(leaves[0],clade), clade.distance(leaves[1],clade)]
                 pairwise_genomes.append((leaves,distances_to_ancestor))
         return pairwise_genomes

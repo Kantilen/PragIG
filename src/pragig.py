@@ -115,19 +115,19 @@ while pairwise_genomes:
             for index, vertex in enumerate(long_path):
                 enumerated_vertices[index] = vertex
 
-            if not len(component.nodes()) <= 14:
-                print "SAMPLE"
-                all_IGs = []
-                for i in range(arguments.repetition):
-                    all_IGs.append(Genome_Sampler.create_adjacency_from_cycle(enumerated_vertices.values()))
-            else:
-                print "ALL"
-                print component.nodes()
-                all_IGs = Genome_Sampler.get_all(enumerated_vertices.values())
-                print all_IGs
+            #if not len(component.nodes()) <= 14:
+                #print "SAMPLE"
+            all_IGs = []
+            for i in range(arguments.repetition):
+                all_IGs.append(Genome_Sampler.create_adjacency_from_cycle(enumerated_vertices.values()))
+            #else:
+            #    print "ALL"
+            #    print enumerated_vertices.values()
+            #    all_IGs = Genome_Sampler.get_all(enumerated_vertices.values(),"INIT")
+                #print "ENDRESULT:", all_IGs
 
             for pot_ancestor in all_IGs:
-                print pot_ancestor
+                #print pot_ancestor
                     #cycle.append(Genome_Sampler.create_adjacency_from_cycle(enumerated_vertices.values()))
                     #pot_ancestor = [x for y in cycle for x in y]
                     #pot_ancestor = Genome_Sampler(component).intermediate_cycle
@@ -149,7 +149,6 @@ while pairwise_genomes:
                     highest_candidate = pot_ancestor
 
             ancestor.extend(highest_candidate)
-
 
 #                sys.exit(0)
 

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import itertools
 
 __author__ = 'klamkiewicz'
 
@@ -58,25 +59,48 @@ class Genome_Sampler():
             #self.sampled_genomes=(model.Genome.genome_from_adjacencies('',cycle))
 
     @staticmethod
-    def get_all(component):
-        #if not component:
-        #    return []
+    def get_all(component, text):
+
+        if not component:
+            return [None]
+
         if len(component) == 2:
             return [model.Adjacency(component[0],component[1])]
 
         assert(len(component) % 2 == 0)
-        possible = []
+
+        ig = []
         for k in range(1,len(component),2):
-            adj = model.Adjacency(component[0],component[k])
-            current = []
-            for adj_1 in [Genome_Sampler.get_all(component[1:k])]:
-                #current.extend(adj_1)
-                for adj_2 in [Genome_Sampler.get_all(component[k+1:])]:
-                    #current.extend(adj_2)
-                    print adj, adj_1, adj_2
-                    possible.append(adj)
-                    possible.extend(adj_1 + adj_2)
-        return possible
+            adj = model.Adjacency(component[0], component[k])
+            for left in Genome_Sampler.get_all(component[1:k], "LEFT%d"%k):
+                all_found = []
+                if not left:
+                    left = []
+                if type(left) == type([]) and left:
+                    all_found = [[adj] + [item] for item in left]
+                else:
+                    all_found = [adj,left]
+
+                all_found = [x for x in all_found if x]
+
+
+                for right in Genome_Sampler.get_all(component[k+1:], "RIGHT%d"%k):
+                    print all_found
+                    if not right:
+                        right = []
+                    if type(right) == type([]) and right:
+                        if len(all_found) == 1:
+                            all_found = [[item] + all_found for item in right]
+                        else:
+                            all_found = [[item] + [element] for item in right for element in all_found]
+                    else:
+                        print right
+                        all_found.extend([right])
+
+                    all_found = [x for x in all_found if x]
+                    ig.append(all_found)
+        return ig
+
 
     def preprocess_conflicts(self):
         for adj in self.graph:
