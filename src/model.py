@@ -1,16 +1,17 @@
 #!/usr/bin/python
 
-__author__ = 'klamkiewicz'
-
 #################################
 # Import section                #
 #################################
+from __future__ import division
 import re
 import numpy as np
 from collections import Counter
 import networkx as nx
-import sys
+import math
 #################################
+
+__author__ = 'klamkiewicz'
 
 class Adjacency():
     def __init__(self, first_ex, second_ex):
@@ -139,6 +140,16 @@ class Genome():
             all_adj.extend([Adjacency(enumerated_vertices[i],enumerated_vertices[j]) for j in range(i,len(enumerated_vertices)) if ((j-i)%2 != 0)])
 
         return all_adj
+
+    def distance_to_genome(self, other_genome):
+        breakpoints = sum(1 for adj in other_genome.adjacency_set if not self.contains(adj))
+        observed = sum(1 for adj in self.adjacency_set if not adj.is_telomere())
+        all_adj = self.adj_length()
+
+        upper = math.log(1-((breakpoints*(2*all_adj -1) ) / (observed*(2*all_adj -2))))
+        lower = math.log(1 - (1/(all_adj-1)) - 1/all_adj)
+        distance = upper / lower
+        return math.ceil(distance)
 
     def length(self):
         return len(self.content)

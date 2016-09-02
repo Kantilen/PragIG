@@ -24,20 +24,20 @@ class Genome_Sampler():
         self.graph = graph
         #self.conflicting_adjacencies = defaultdict(set)
         #self.preprocess_conflicts()
-        self.sampled_genomes = []
+        #self.sampled_genomes = []
         #self.create_genomes()
-        self.intermediate_cycle = self.enumerate_vertices()
+        #self.intermediate_cycle = self.enumerate_vertices()
         #print self.create_adjacency_from_cycle(self.graph)
 
-    @staticmethod
-    def create_adjacency_from_cycle(cycle):
+    #@staticmethod
+    def create_adjacency_from_cycle(self, cycle):
         if not cycle:
             return []
         assert(len(cycle) % 2 == 0)
 
         adj = random.randint(0, len(cycle)/2 -1) * 2 + 1
-        return Genome_Sampler.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(cycle[0],cycle[adj])] + \
-               Genome_Sampler.create_adjacency_from_cycle(cycle[adj+1:])
+        return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(cycle[0],cycle[adj])] + \
+               self.create_adjacency_from_cycle(cycle[adj+1:])
 
     def enumerate_vertices(self):
 
@@ -55,8 +55,8 @@ class Genome_Sampler():
 
                cycle.append(self.create_adjacency_from_cycle(enumerated_vertices.values()))
             cycle = [x for y in cycle for x in y]
-            return cycle
-            #self.sampled_genomes=(model.Genome.genome_from_adjacencies('',cycle))
+            #return cycle
+            return model.Genome.genome_from_adjacencies('',cycle)
 
     @staticmethod
     def get_all(component, text):

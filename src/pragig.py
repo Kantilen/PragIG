@@ -47,39 +47,6 @@ calculate_probability.preprocess_transitions(2*max_length, gene_number)
 
 potential_ancestors = {}
 
-
-
-
-###########################################
-# DEBUGGING CORNER HERE!
-# Current model seems to suck, therefore
-# I implement some small stuff that will
-# check the quality of the results
-# produced by the model
-###########################################
-
-pair = pairwise_genomes.pop()
-names = pair[0]
-first_genome = all_genomes[names[0]]
-second_genome = all_genomes[names[1]]
-
-adjacency_set = set(first_genome.adjacency_set).union(second_genome.adjacency_set)
-
-inter_info = IG(first_genome, second_genome)
-inter_info.create_circular_graph()
-
-first_binary = first_genome.create_binary_vector(adjacency_set, inter_info.circular_breakpoint)
-second_binary = second_genome.create_binary_vector(adjacency_set, inter_info.circular_breakpoint)
-
-
-distance = input.tree[0].distance(names[0],names[1])
-
-for i in range(1, int(distance)+50, 1):
-    print i, calculate_probability.calculate_probability({names[0]:first_binary}, second_binary, {names[0]: i})
-
-
-sys.exit(0)
-
 # main iteration
 while pairwise_genomes:
     pair = pairwise_genomes.pop()
@@ -89,15 +56,6 @@ while pairwise_genomes:
     distances = {}
     for genome_name in all_genomes.keys():
         distances[genome_name] = input.tree[0].distance(lca, genome_name)
-
-
-    #distances = pair[1]
-    #first_content = input.genomes[names[0]]
-    #second_content = input.genomes[names[1]]
-
-    # Create instance of Intermediate_Genome with the two current sibling-genomes.
-    #first_genome = Genome(names[0], first_content)
-    #second_genome = Genome(names[1], second_content)
 
     first_genome = all_genomes[names[0]]
     second_genome = all_genomes[names[1]]
@@ -123,102 +81,129 @@ while pairwise_genomes:
         ancestor = second_genome
     else:
         ancestor = []
+        sampler = Genome_Sampler(inter_info.circular_breakpoint)
 
-        for component in nx.connected_component_subgraphs(inter_info.circular_breakpoint):
-            if len(component.nodes()) == 2:
-                ancestor.append(Adjacency(component.nodes()[0], component.nodes()[1]))
-                continue
+        #all_IGs = []
+        highest_prob = None
+        for i in range(arguments.repetition):
 
-            adj_set_first_genome = []
-            adj_set_second_genome = []
-            for edge in component.edges():
-                colors = component.get_edge_data(*edge).values()
-                adj_set_first_genome.extend([Adjacency(edge[0],edge[1]) for color in colors if color['color'] == 'A' ])
-                adj_set_second_genome.extend([Adjacency(edge[0], edge[1]) for color in colors if color['color'] == 'B'])
-            extant_adjacencies = set(adj_set_first_genome).union(set(adj_set_second_genome))
+            sampled_genome = sampler.enumerate_vertices()
+            expected_DCJ_first = sampled_genome.distance_to_genome(first_genome)
+            expected_DCJ_second = sampled_genome.distance_to_genome(second_genome)
 
-            highest_candidate = None
-            highest_prob = None
 
-            cycle = []
+            all_first = ((first_genome.adj_length() * (first_genome.adj_length()+1)) / 2) ** int(expected_DCJ_first)
 
-            enumerated_vertices = {}
+            first_IG = IG(first_genome, sampled_genome)
 
-            first_adj = component.edges()[0]
-            long_path = [x for x in nx.all_simple_paths(component, first_adj[0], first_adj[1])][-1]
+            first_IG.create_circular_graph()
+
+            first_lengths = {}
+            for index,component in enumerate(nx.connected_component_subgraphs(first_IG.circular_breakpoint)):
+                if len(component.nodes()) == 2:
+                    continue
+                first_lengths[index] = (len(component.nodes()) / 2) - 1
+
+            upper = 0
+            lower = 1
+            prod = 1
+            for comp, dist in first_lengths.items():
+                upper += dist
+                lower *= math.factorial(dist)
+                prod *= (dist + 1) ** (dist - 1)
+
+            first_scenarios = (math.factorial(upper) / lower) * prod
+            prob_first = math.log10(first_scenarios) - math.log10(all_first)
+
+            all_second = ((second_genome.adj_length() * (second_genome.adj_length() + 1)) / 2) ** int(expected_DCJ_second)
+            second_IG = IG(second_genome, sampled_genome)
+            second_IG.create_circular_graph()
+
+            second_distances = {}
+            for index, component in enumerate(nx.connected_component_subgraphs(second_IG.circular_breakpoint)):
+                if len(component.nodes()) == 2:
+                    continue
+                second_distances[index] = (len(component.nodes()) / 2) - 1
+
+            upper = 0
+            lower = 1
+            prod = 1
+            for comp, dist in second_distances.items():
+                upper += dist
+                lower *= math.factorial(dist)
+                prod *= (dist + 1) ** (dist - 1)
+
+            second_scenarios = (math.factorial(upper) / lower) * prod
+            prob_second = math.log10(second_scenarios) - math.log(all_second)
+
+            prob = prob_first + prob_second
+            if prob > highest_prob:
+                highest_prob = prob
+                ancestor = sampled_genome
+
+        #sys.exit(0)
+
+        #for component in nx.connected_component_subgraphs(inter_info.circular_breakpoint):
+        #    if len(component.nodes()) == 2:
+        #        ancestor.append(Adjacency(component.nodes()[0], component.nodes()[1]))
+        #        continue
+
+        #    adj_set_first_genome = []
+        #    adj_set_second_genome = []
+        #    for edge in component.edges():
+        #        colors = component.get_edge_data(*edge).values()
+        #        adj_set_first_genome.extend([Adjacency(edge[0],edge[1]) for color in colors if color['color'] == 'A' ])
+        #        adj_set_second_genome.extend([Adjacency(edge[0], edge[1]) for color in colors if color['color'] == 'B'])
+        #    extant_adjacencies = set(adj_set_first_genome).union(set(adj_set_second_genome))
+
+        #    highest_candidate = None
+        #    highest_prob = None
+
+        #    cycle = []
+
+        #    enumerated_vertices = {}
+
+         #   first_adj = component.edges()[0]
+         #   long_path = [x for x in nx.all_simple_paths(component, first_adj[0], first_adj[1])][-1]
             # assign value for each vertex from 0 to n
-            for index, vertex in enumerate(long_path):
-                enumerated_vertices[index] = vertex
+         #   for index, vertex in enumerate(long_path):
+         #       enumerated_vertices[index] = vertex
 
             #if not len(component.nodes()) <= 14:
                 #print "SAMPLE"
-            all_IGs = []
-            for i in range(arguments.repetition):
-                all_IGs.append(Genome_Sampler.create_adjacency_from_cycle(enumerated_vertices.values()))
+         #   all_IGs = []
+         #   for i in range(arguments.repetition):
+         #       all_IGs.append(Genome_Sampler.create_adjacency_from_cycle(enumerated_vertices.values()))
             #else:
             #    print "ALL"
             #    print enumerated_vertices.values()
             #    all_IGs = Genome_Sampler.get_all(enumerated_vertices.values(),"INIT")
                 #print "ENDRESULT:", all_IGs
 
-            for pot_ancestor in all_IGs:
+         #   for pot_ancestor in all_IGs:
                 #print pot_ancestor
                     #cycle.append(Genome_Sampler.create_adjacency_from_cycle(enumerated_vertices.values()))
                     #pot_ancestor = [x for y in cycle for x in y]
                     #pot_ancestor = Genome_Sampler(component).intermediate_cycle
-                all_adjacencies = list(extant_adjacencies.union(pot_ancestor))
+          #      all_adjacencies = list(extant_adjacencies.union(pot_ancestor))
 
-                binaries = {}
-                for genome in all_genomes.items():
-                    binaries[genome[0]] = genome[1].create_binary_vector(all_adjacencies, inter_info.circular_breakpoint)
-
-                #print all_adjacencies
-                #print pot_ancestor
-
-                ancestor_binary = [1 if adj in pot_ancestor else 0 for adj in all_adjacencies]
-                #print ancestor_binary
-                #print "\n"
-                prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
-                if prob > highest_prob:
-                    highest_prob = prob
-                    highest_candidate = pot_ancestor
-
-            ancestor.extend(highest_candidate)
-
-#                sys.exit(0)
-
-        ancestor = Genome.genome_from_adjacencies("", ancestor)
-            #print ancestor
-
-            #highest_prob = None
-            #extant_adjacencies = set(first_genome.adjacency_set).union(set(second_genome.adjacency_set))
-
-            #ancestor = None
+           #     binaries = {}
+           #     for genome in all_genomes.items():
+           #         binaries[genome[0]] = genome[1].create_binary_vector(all_adjacencies, inter_info.circular_breakpoint)
 
 
-            #else:
-            # Sample genomes from the breakpoint graph
-            #    for i in range(arguments.repetition):
-            #        pot_ancestor = Genome_Sampler(inter_info.circular_breakpoint).sampled_genomes
+           #     ancestor_binary = [1 if adj in pot_ancestor else 0 for adj in all_adjacencies]
 
-            #for pot_ancestor in sampled_genomes:
-            #ancestral_adjacencies = list(extant_adjacencies.union(pot_ancestor.adjacency_set))
+           #     prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
+           #     if prob > highest_prob:
+           #         highest_prob = prob
+           #         highest_candidate = pot_ancestor
 
-            #binaries = {}
-            #for genome in all_genomes.items():
-            #    binaries[genome[0]] = genome[1].create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+           # ancestor.extend(highest_candidate)
 
-            #ancestor_binary = pot_ancestor.create_binary_vector(ancestral_adjacencies, inter_info.circular_breakpoint)
+#
 
-            #prob = calculate_probability.calculate_probability(binaries, ancestor_binary, distances)
-
-            #if prob > highest_prob:
-            #    highest_prob = prob
-            #    ancestor = pot_ancestor
-
-
-
-
+        #ancestor = Genome.genome_from_adjacencies("", ancestor)
 
     ancestor.name = "%s%s" % (names[0], names[1])
 
