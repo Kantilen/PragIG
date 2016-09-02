@@ -2,6 +2,7 @@
 from __future__ import division
 import sys
 import math
+
 from collections import defaultdict
 __author__ = 'klamkiewicz'
 
@@ -23,11 +24,13 @@ def preprocess_transitions(length, size):
     # 1 -> 1
     prob_keep_adj = 1 - prob_cut_adj
 
-    probabilities = [{1: math.log(prob_form_adj)}, {1: math.log(prob_avoid_adj)}, {1: math.log(prob_cut_adj)}, {1: math.log(prob_keep_adj)}]
+    probabilities = [{1: math.log10(prob_form_adj)}, {1: math.log10(prob_avoid_adj)}, {1: math.log10(prob_cut_adj)}, {1: math.log10(prob_keep_adj)}]
+
     first_transition_probabilities = dict(zip(identifier,probabilities))
     transition_length.update(dynamic_table(length, first_transition_probabilities))
 
 def dynamic_table(length, transitions):
+
     for index in range(2,length+1):
         for event in transitions.keys():
             i,j = event

@@ -6,6 +6,8 @@
 import argparse as args
 import sys
 import networkx as nx
+import math
+import bigfloat
 
 from input_parser import Input
 from genome_sampler import Genome_Sampler
@@ -44,6 +46,39 @@ gene_number = all_genomes.values()[0].adj_length()
 calculate_probability.preprocess_transitions(2*max_length, gene_number)
 
 potential_ancestors = {}
+
+
+
+
+###########################################
+# DEBUGGING CORNER HERE!
+# Current model seems to suck, therefore
+# I implement some small stuff that will
+# check the quality of the results
+# produced by the model
+###########################################
+
+pair = pairwise_genomes.pop()
+names = pair[0]
+first_genome = all_genomes[names[0]]
+second_genome = all_genomes[names[1]]
+
+adjacency_set = set(first_genome.adjacency_set).union(second_genome.adjacency_set)
+
+inter_info = IG(first_genome, second_genome)
+inter_info.create_circular_graph()
+
+first_binary = first_genome.create_binary_vector(adjacency_set, inter_info.circular_breakpoint)
+second_binary = second_genome.create_binary_vector(adjacency_set, inter_info.circular_breakpoint)
+
+
+distance = input.tree[0].distance(names[0],names[1])
+
+for i in range(1, int(distance)+50, 1):
+    print i, calculate_probability.calculate_probability({names[0]:first_binary}, second_binary, {names[0]: i})
+
+
+sys.exit(0)
 
 # main iteration
 while pairwise_genomes:
