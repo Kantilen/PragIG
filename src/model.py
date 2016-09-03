@@ -163,6 +163,9 @@ class Genome():
     def chr_number(self):
         return Counter(self.content)['$'] + Counter(self.content)[')']
 
+    def linear_chromosomes(self):
+        return Counter(self.content)['$']
+
 
     @staticmethod
     def genome_from_adjacencies(name, adjacency_set):
