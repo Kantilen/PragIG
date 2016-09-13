@@ -39,7 +39,10 @@ while leaves:
     reference.genomes[new_key] = content
 
     genome_reference = Genome("ref", content)
-    genome_calculated = Genome("calc", calculated_ancestors[new_key])
+    try:
+        genome_calculated = Genome("calc", calculated_ancestors[new_key])
+    except KeyError:
+        continue
 
     true_positives = sum(1 for adj in genome_calculated.adjacency_set if adj in genome_reference.adjacency_set)
     false_positives = sum(1 for adj in genome_calculated.adjacency_set if not adj in genome_reference.adjacency_set)

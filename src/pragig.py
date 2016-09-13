@@ -91,11 +91,18 @@ while pairwise_genomes:
             sampled_genome = sampler.enumerate_vertices()
             expected_DCJ_first = sampled_genome.distance_to_genome(first_genome)
             expected_DCJ_second = sampled_genome.distance_to_genome(second_genome)
-            print
-            print i
-            print expected_DCJ_first, distances[names[0]]
-            print expected_DCJ_second, distances[names[1]]
-            print expected_DCJ_first + expected_DCJ_second, distances[names[0]]+distances[names[1]]
+            #print
+            #print i
+            #print expected_DCJ_first, distances[names[0]]
+            #print expected_DCJ_second, distances[names[1]]
+            #print expected_DCJ_first + expected_DCJ_second, distances[names[0]]+distances[names[1]]
+
+            #if expected_DCJ_first < distances[names[0]] or expected_DCJ_second < distances[names[1]]:
+            #    print "DISCARDING :("
+            #    #continue
+
+            #else:
+            #    print "CALCULATING! :)"
 
 
             all_first = ((first_genome.adj_length() * (first_genome.adj_length()+1)) / 2) ** int(expected_DCJ_first)
@@ -105,25 +112,6 @@ while pairwise_genomes:
 
             second_IG = IG(second_genome, sampled_genome)
             second_IG.create_circular_graph()
-
-            no_cycle_first = sorted([sampled_genome.length() + first_genome.linear_chromosomes() - distances[names[0]],
-                        sampled_genome.length() + second_genome.linear_chromosomes() - distances[names[0]]])
-
-            no_cycle_second = sorted([sampled_genome.length() + first_genome.linear_chromosomes() - distances[names[1]],
-                                    sampled_genome.length() + second_genome.linear_chromosomes() - distances[names[1]]])
-
-            to_int = lambda x: int(x)
-            no_cycle_first = [to_int(x) for x in no_cycle_first]
-            no_cycle_second = [to_int(x) for x in no_cycle_second]
-            
-
-            if not (nx.number_connected_components(first_IG.circular_breakpoint) in range(no_cycle_first[0],no_cycle_first[1]) or
-                    nx.number_connected_components(second_IG.circular_breakpoint) in range(no_cycle_second[0], no_cycle_second[1])):
-                print nx.number_connected_components(first_IG.circular_breakpoint), no_cycle_first
-                print nx.number_connected_components(second_IG.circular_breakpoint), no_cycle_second
-                print "DISCARD"
-                continue
-
 
             first_lengths = {}
             for index,component in enumerate(nx.connected_component_subgraphs(first_IG.circular_breakpoint)):
@@ -167,7 +155,8 @@ while pairwise_genomes:
                 highest_prob = prob
                 ancestor = sampled_genome
 
-        sys.exit(0)
+        #print ancestor.content
+        #sys.exit(0)
 
         #for component in nx.connected_component_subgraphs(inter_info.circular_breakpoint):
         #    if len(component.nodes()) == 2:
