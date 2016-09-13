@@ -149,7 +149,7 @@ class Genome():
         upper = math.log(1-((breakpoints*(2*all_adj -1) ) / (observed*(2*all_adj -2))))
         lower = math.log(1 - (1/(all_adj-1)) - 1/all_adj)
         distance = upper / lower
-        return math.floor(distance)
+        return int(math.floor(distance))
 
     def length(self):
         return len(self.content)

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from __future__ import division
 import sys
+import networkx as nx
 import math
 
 from collections import defaultdict
@@ -44,3 +45,26 @@ def calculate_probability(binaries, ancestral, distances):
         for identifier in binaries.keys():
             prob += transition_length[(binaries[identifier][index],element)][distances[identifier]]
     return prob
+
+def optimal_scenarios(graph):
+    distances = {}
+    for component in nx.connected_component_subgraphs(graph):
+        if len(component) == 2:
+            continue
+        distances[component] = (len(component)/2) - 1
+
+    upper = 0
+    lower = 1
+    prod = 1
+    for distance in distances.values():
+        upper += distance
+        lower *= math.factorial(distance)
+        prod *= (distance + 1) ** (distance - 1)
+
+    return math.log10(math.factorial(upper)) - math.log10(lower) + math.log10(prod)
+
+def all_scenarios(length, expected_distance):
+    result = 0
+    for i in range(expected_distance):
+        result += (math.log10(length) + math.log10(length-1)) - math.log10(2)
+    return result

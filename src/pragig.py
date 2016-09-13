@@ -93,13 +93,23 @@ while pairwise_genomes:
         ##############################################
         ##############################################
 
-        print distances
-        print names
-        print all_genomes
-        print input.tree
-
         for i in range(arguments.repetition):
-            print i
+            candidate = sampler.enumerate_vertices()
+            probability = 0
+            for identifier, genome in all_genomes.items():
+                breakpoint_graph = IG(genome, candidate)
+                breakpoint_graph.create_circular_graph()
+                breakpoint_graph = breakpoint_graph.circular_breakpoint
+                expected_distance = genome.distance_to_genome(candidate)
+
+
+                sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
+                all_scen = calculate_probability.all_scenarios(genome.adj_length(), expected_distance)
+                probability += (sorting_scen - all_scen)
+
+            if probability > highest_prob:
+                highest_prob = probability
+                ancestor = candidate
 
         #for single_component in nx.connected_component_subgraphs(inter_info.circular_breakpoint):
         #    if len(single_component.nodes()) == 2:
@@ -134,7 +144,7 @@ while pairwise_genomes:
         #            print "A: ", all_A_adjacencies, breakpoints_to_A
         #            print "B: ", all_B_adjacencies, breakpoints_to_B
 
-        break
+        #break
 
    #     for i in range(arguments.repetition):
 
@@ -316,4 +326,4 @@ def write_output():
                         output.write('\n')
                     break
 
-#write_output()
+write_output()
