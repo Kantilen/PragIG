@@ -7,7 +7,7 @@ import argparse as args
 import sys
 import networkx as nx
 import math
-import bigfloat
+#import bigfloat
 
 from input_parser import Input
 from genome_sampler import Genome_Sampler
