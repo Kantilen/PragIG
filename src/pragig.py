@@ -86,11 +86,56 @@ while pairwise_genomes:
 
         #all_IGs = []
         highest_prob = None
-        for i in range(arguments.repetition):
 
-            sampled_genome = sampler.enumerate_vertices()
-            expected_DCJ_first = sampled_genome.distance_to_genome(first_genome)
-            expected_DCJ_second = sampled_genome.distance_to_genome(second_genome)
+        ##############################################
+        ##############################################
+        # TUESDAY 13 SEPTEMBER. STARTING ALL OVER :) #
+        ##############################################
+        ##############################################
+
+        print distances
+        print names
+        print all_genomes
+        print input.tree
+
+        for single_component in nx.connected_component_subgraphs(inter_info.circular_breakpoint):
+            if len(single_component.nodes()) == 2:
+                continue
+            else:
+                size = len(single_component.nodes())
+                single_distance = (size/2) - 1
+
+                #print [(x,single_component.get_edge_data(*x).values()[0]['color']) for x in single_component.edges()]
+
+                all_A_adjacencies = [x for x in single_component.edges() if
+                                     single_component.get_edge_data(*x).values()[0]['color'] == 'A']
+
+                all_B_adjacencies = [x for x in single_component.edges() if
+                                     single_component.get_edge_data(*x).values()[0]['color'] == 'B']
+
+                print
+                print all_A_adjacencies
+                print all_B_adjacencies
+
+                enumerated_vertices = {}
+                first_adj = single_component.edges()[0]
+                long_path = [x for x in nx.all_simple_paths(single_component, first_adj[0], first_adj[1])][-1]
+                #assign value for each vertex from 0 to n
+                for index, vertex in enumerate(long_path):
+                    enumerated_vertices[index] = vertex
+
+                for i in range(arguments.repetition):
+                    inter_comp = sampler.create_adjacency_from_cycle(enumerated_vertices.values())
+
+                    
+
+        break
+
+   #     for i in range(arguments.repetition):
+
+   #         sampled_genome = sampler.enumerate_vertices()
+   #         expected_DCJ_first = sampled_genome.distance_to_genome(first_genome)
+   #         expected_DCJ_second = sampled_genome.distance_to_genome(second_genome)
             #print
             #print i
             #print expected_DCJ_first, distances[names[0]]
@@ -105,55 +150,55 @@ while pairwise_genomes:
             #    print "CALCULATING! :)"
 
 
-            all_first = ((first_genome.adj_length() * (first_genome.adj_length()+1)) / 2) ** int(expected_DCJ_first)
+   #         all_first = ((first_genome.adj_length() * (first_genome.adj_length()+1)) / 2) ** int(expected_DCJ_first)
 
-            first_IG = IG(first_genome, sampled_genome)
-            first_IG.create_circular_graph()
+            #first_IG = IG(first_genome, sampled_genome)
+            #first_IG.create_circular_graph()
 
-            second_IG = IG(second_genome, sampled_genome)
-            second_IG.create_circular_graph()
+            #second_IG = IG(second_genome, sampled_genome)
+            #second_IG.create_circular_graph()
 
-            first_lengths = {}
-            for index,component in enumerate(nx.connected_component_subgraphs(first_IG.circular_breakpoint)):
-                if len(component.nodes()) == 2:
-                    continue
-                first_lengths[index] = (len(component.nodes()) / 2) - 1
+            #first_lengths = {}
+            #for index,component in enumerate(nx.connected_component_subgraphs(first_IG.circular_breakpoint)):
+            #    if len(component.nodes()) == 2:
+            #        continue
+            #    first_lengths[index] = (len(component.nodes()) / 2) - 1
 
-            upper = 0
-            lower = 1
-            prod = 1
-            for comp, dist in first_lengths.items():
-                upper += dist
-                lower *= math.factorial(dist)
-                prod *= (dist + 1) ** (dist - 1)
+            #upper = 0
+            #lower = 1
+            #prod = 1
+            #for comp, dist in first_lengths.items():
+            #    upper += dist
+            #    lower *= math.factorial(dist)
+            #    prod *= (dist + 1) ** (dist - 1)
 
-            first_scenarios = (math.factorial(upper) / lower) * prod
-            prob_first = math.log10(first_scenarios) - math.log10(all_first)
+            #first_scenarios = (math.factorial(upper) / lower) * prod
+            #prob_first = math.log10(first_scenarios) - math.log10(all_first)
 
-            all_second = ((second_genome.adj_length() * (second_genome.adj_length() + 1)) / 2) ** int(expected_DCJ_second)
+            #all_second = ((second_genome.adj_length() * (second_genome.adj_length() + 1)) / 2) ** int(expected_DCJ_second)
 
 
-            second_distances = {}
-            for index, component in enumerate(nx.connected_component_subgraphs(second_IG.circular_breakpoint)):
-                if len(component.nodes()) == 2:
-                    continue
-                second_distances[index] = (len(component.nodes()) / 2) - 1
+            #second_distances = {}
+            #for index, component in enumerate(nx.connected_component_subgraphs(second_IG.circular_breakpoint)):
+             #   if len(component.nodes()) == 2:
+             #       continue
+             #   second_distances[index] = (len(component.nodes()) / 2) - 1
 
-            upper = 0
-            lower = 1
-            prod = 1
-            for comp, dist in second_distances.items():
-                upper += dist
-                lower *= math.factorial(dist)
-                prod *= (dist + 1) ** (dist - 1)
+            #upper = 0
+            #lower = 1
+            #prod = 1
+            #for comp, dist in second_distances.items():
+             #   upper += dist
+             #   lower *= math.factorial(dist)
+             #   prod *= (dist + 1) ** (dist - 1)
 
-            second_scenarios = (math.factorial(upper) / lower) * prod
-            prob_second = math.log10(second_scenarios) - math.log10(all_second)
+            #second_scenarios = (math.factorial(upper) / lower) * prod
+            #prob_second = math.log10(second_scenarios) - math.log10(all_second)
 
-            prob = prob_first + prob_second
-            if prob > highest_prob:
-                highest_prob = prob
-                ancestor = sampled_genome
+            #prob = prob_first + prob_second
+            #if prob > highest_prob:
+             #   highest_prob = prob
+             #   ancestor = sampled_genome
 
         #print ancestor.content
         #sys.exit(0)
@@ -234,31 +279,36 @@ while pairwise_genomes:
 
 ###############################################################################################
 
-if arguments.output_file:
-    output = open(arguments.output_file, 'w')
 
-for result_name, result_content in input.genomes.items():
-    result = Genome(result_name,result_content)
-    chromosome = result.chr_number()
 
-    if not arguments.output_file:
-        print '>',result_name
-    else:
-        output.write('>%s\n' % (result_name))
-    for i in range(chromosome):
+def write_output():
+    if arguments.output_file:
+        output = open(arguments.output_file, 'w')
+
+    for result_name, result_content in input.genomes.items():
+        result = Genome(result_name,result_content)
+        chromosome = result.chr_number()
+
         if not arguments.output_file:
-            print '# chr%d' % (i+1)
+            print '>',result_name
         else:
-            output.write('#chr%d\n' % (i + 1))
-        for index, gene in enumerate(result_content):
+            output.write('>%s\n' % (result_name))
+        for i in range(chromosome):
             if not arguments.output_file:
-                print gene,
+                print '# chr%d' % (i+1)
             else:
-                output.write("%s " % (gene))
-            if gene == ')' or gene == '$':
-                result_content = result_content[index+1:]
+                output.write('#chr%d\n' % (i + 1))
+            for index, gene in enumerate(result_content):
                 if not arguments.output_file:
-                    print
+                    print gene,
                 else:
-                    output.write('\n')
-                break
+                    output.write("%s " % (gene))
+                if gene == ')' or gene == '$':
+                    result_content = result_content[index+1:]
+                    if not arguments.output_file:
+                        print
+                    else:
+                        output.write('\n')
+                    break
+
+#write_output()

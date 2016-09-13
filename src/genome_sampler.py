@@ -55,8 +55,8 @@ class Genome_Sampler():
 
                cycle.append(self.create_adjacency_from_cycle(enumerated_vertices.values()))
             cycle = [x for y in cycle for x in y]
-            #return cycle
-            return model.Genome.genome_from_adjacencies('',cycle)
+            return cycle
+            #return model.Genome.genome_from_adjacencies('',cycle)
 
     @staticmethod
     def get_all(component, text):
