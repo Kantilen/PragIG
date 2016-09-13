@@ -107,15 +107,11 @@ while pairwise_genomes:
 
                 #print [(x,single_component.get_edge_data(*x).values()[0]['color']) for x in single_component.edges()]
 
-                all_A_adjacencies = [x for x in single_component.edges() if
+                all_A_adjacencies = [Adjacency(x[0],x[1]) for x in single_component.edges() if
                                      single_component.get_edge_data(*x).values()[0]['color'] == 'A']
 
-                all_B_adjacencies = [x for x in single_component.edges() if
+                all_B_adjacencies = [Adjacency(x[0],x[1]) for x in single_component.edges() if
                                      single_component.get_edge_data(*x).values()[0]['color'] == 'B']
-
-                print
-                print all_A_adjacencies
-                print all_B_adjacencies
 
                 enumerated_vertices = {}
                 first_adj = single_component.edges()[0]
@@ -126,8 +122,10 @@ while pairwise_genomes:
 
                 for i in range(arguments.repetition):
                     inter_comp = sampler.create_adjacency_from_cycle(enumerated_vertices.values())
-
-                    
+                    print
+                    print inter_comp
+                    print "A: ", all_A_adjacencies, sum(1 for adj in inter_comp if adj in all_A_adjacencies)
+                    print "B: ", all_B_adjacencies, sum(1 for adj in inter_comp if adj in all_B_adjacencies)
 
         break
 
