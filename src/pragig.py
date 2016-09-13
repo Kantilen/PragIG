@@ -98,34 +98,41 @@ while pairwise_genomes:
         print all_genomes
         print input.tree
 
-        for single_component in nx.connected_component_subgraphs(inter_info.circular_breakpoint):
-            if len(single_component.nodes()) == 2:
-                continue
-            else:
-                size = len(single_component.nodes())
-                single_distance = (size/2) - 1
+        for i in range(arguments.repetition):
+            print i
 
-                #print [(x,single_component.get_edge_data(*x).values()[0]['color']) for x in single_component.edges()]
+        #for single_component in nx.connected_component_subgraphs(inter_info.circular_breakpoint):
+        #    if len(single_component.nodes()) == 2:
+        #        continue
+        #    else:
+        #        size = len(single_component.nodes())
+        #        single_distance = (size/2) - 1
 
-                all_A_adjacencies = [Adjacency(x[0],x[1]) for x in single_component.edges() if
-                                     single_component.get_edge_data(*x).values()[0]['color'] == 'A']
+        #        #print [(x,single_component.get_edge_data(*x).values()[0]['color']) for x in single_component.edges()]
 
-                all_B_adjacencies = [Adjacency(x[0],x[1]) for x in single_component.edges() if
-                                     single_component.get_edge_data(*x).values()[0]['color'] == 'B']
+        #        all_A_adjacencies = [Adjacency(x[0],x[1]) for x in single_component.edges() if
+        #                             single_component.get_edge_data(*x).values()[0]['color'] == 'A']
 
-                enumerated_vertices = {}
-                first_adj = single_component.edges()[0]
-                long_path = [x for x in nx.all_simple_paths(single_component, first_adj[0], first_adj[1])][-1]
-                #assign value for each vertex from 0 to n
-                for index, vertex in enumerate(long_path):
-                    enumerated_vertices[index] = vertex
+        #        all_B_adjacencies = [Adjacency(x[0],x[1]) for x in single_component.edges() if
+        #                             single_component.get_edge_data(*x).values()[0]['color'] == 'B']
 
-                for i in range(arguments.repetition):
-                    inter_comp = sampler.create_adjacency_from_cycle(enumerated_vertices.values())
-                    print
-                    print inter_comp
-                    print "A: ", all_A_adjacencies, sum(1 for adj in inter_comp if adj in all_A_adjacencies)
-                    print "B: ", all_B_adjacencies, sum(1 for adj in inter_comp if adj in all_B_adjacencies)
+        #        enumerated_vertices = {}
+        #        first_adj = single_component.edges()[0]
+        #        long_path = [x for x in nx.all_simple_paths(single_component, first_adj[0], first_adj[1])][-1]
+        #        #assign value for each vertex from 0 to n
+        #        for index, vertex in enumerate(long_path):
+        #            enumerated_vertices[index] = vertex
+
+        #        for i in range(arguments.repetition):
+        #            inter_comp = sampler.create_adjacency_from_cycle(enumerated_vertices.values())
+
+        #            breakpoints_to_A = sum(1 for adj in inter_comp if not adj in all_A_adjacencies)
+        #            breakpoints_to_B = sum(1 for adj in inter_comp if not adj in all_B_adjacencies)
+
+        #            print
+        #            print inter_comp
+        #            print "A: ", all_A_adjacencies, breakpoints_to_A
+        #            print "B: ", all_B_adjacencies, breakpoints_to_B
 
         break
 
