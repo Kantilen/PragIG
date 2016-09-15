@@ -97,10 +97,14 @@ while pairwise_genomes:
             candidate = sampler.enumerate_vertices()
             probability = 0
             for identifier, genome in all_genomes.items():
+                expected_distance = genome.distance_to_genome(candidate)
+
+                if expected_distance < distances[identifier]:
+                    break
+
                 breakpoint_graph = IG(genome, candidate)
                 breakpoint_graph.create_circular_graph()
                 breakpoint_graph = breakpoint_graph.circular_breakpoint
-                expected_distance = genome.distance_to_genome(candidate)
 
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
