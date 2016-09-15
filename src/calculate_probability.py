@@ -54,14 +54,16 @@ def optimal_scenarios(graph):
         distances[component] = (len(component)/2) - 1
 
     upper = 0
-    lower = 1
+    lower = 0
     prod = 1
     for distance in distances.values():
         upper += distance
-        lower *= math.factorial(distance)
-        prod *= (distance + 1) ** (distance - 1)
+        lower += math.log10(math.factorial(distance))
+        for i in range(distance-1):
+            prod += math.log10(distance+1)
+        #prod *= (distance + 1) ** (distance - 1)
 
-    return math.log10(math.factorial(upper)) - math.log10(lower) + math.log10(prod)
+    return math.log10(math.factorial(upper)) - lower + prod
 
 def all_scenarios(length, expected_distance):
     result = 0
