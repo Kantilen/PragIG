@@ -51,7 +51,8 @@ def optimal_scenarios(graph):
     for component in nx.connected_component_subgraphs(graph):
         if len(component) == 2:
             continue
-        distances[component] = (len(component)/2) - 1
+        #TODO: Check what's going on here.... float?
+        distances[component] = int((len(component)/2) - 1)
 
     upper = 0
     lower = 0
