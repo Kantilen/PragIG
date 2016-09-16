@@ -103,8 +103,8 @@ while pairwise_genomes:
                 expected_distances[identifier] = genome.distance_to_genome(candidate)
                 #expected_distance = genome.distance_to_genome(candidate)
 
-            if any(expected_distances[ident] < distances[ident] for ident in all_genomes.keys()):
-                break
+            #if any(expected_distances[ident] < distances[ident] for ident in all_genomes.keys()):
+            #    break
 
                 #if expected_distance < distances[identifier]:
                 #    break
