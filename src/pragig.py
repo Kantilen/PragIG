@@ -54,6 +54,8 @@ while pairwise_genomes:
     names = pair[0]
     lca = input.tree[0].common_ancestor(names)
 
+    print >> sys.stderr, names
+
     distances = {}
     for genome_name in all_genomes.keys():
         distances[genome_name] = input.tree[0].distance(lca, genome_name)
@@ -95,20 +97,26 @@ while pairwise_genomes:
 
         for i in range(arguments.repetition):
             candidate = sampler.enumerate_vertices()
+            expected_distances = {}
             probability = 0
             for identifier, genome in all_genomes.items():
-                expected_distance = genome.distance_to_genome(candidate)
+                expected_distances[identifier] = genome.distance_to_genome(candidate)
+                #expected_distance = genome.distance_to_genome(candidate)
 
-                if expected_distance < distances[identifier]:
-                    break
+            if any(expected_distances[ident] < distances[ident] for ident in all_genomes.keys()):
+                break
 
+                #if expected_distance < distances[identifier]:
+                #    break
+
+            for identifier, genome in all_genomes.items():
                 breakpoint_graph = IG(genome, candidate)
                 breakpoint_graph.create_circular_graph()
                 breakpoint_graph = breakpoint_graph.circular_breakpoint
 
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
-                all_scen = calculate_probability.all_scenarios(genome.adj_length(), expected_distance)
+                all_scen = calculate_probability.all_scenarios(genome.adj_length(), expected_distances[identifier])
                 probability += (sorting_scen - all_scen)
 
             if probability > highest_prob:
