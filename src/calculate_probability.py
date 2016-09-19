@@ -69,5 +69,5 @@ def optimal_scenarios(graph):
 def all_scenarios(length, expected_distance):
     result = 0
     for i in range(expected_distance):
-        result += (math.log10(length) + math.log10(length-1)) - math.log10(2)
+        result += (math.log10(length) + math.log10(length-1))
     return result
