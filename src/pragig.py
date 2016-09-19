@@ -92,8 +92,8 @@ while pairwise_genomes:
         # TUESDAY 13 SEPTEMBER. STARTING ALL OVER :) #
         ##############################################
         ##############################################
-
-        for i in range(arguments.repetition):
+        while i != arguments.repetition:
+        #for i in range(arguments.repetition):
             candidate = sampler.enumerate_vertices()
             expected_distances = {}
             probability = 0
@@ -115,16 +115,19 @@ while pairwise_genomes:
                 no_cycles = len(nx.connected_component_subgraphs(breakpoint_graph))
                 distance = candidate.length() - no_cycles
 
-                if distance < distances[indent]:
+                if distance < distances[identifier]:
                     break
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
                 all_scen = calculate_probability.all_scenarios(genome.adj_length(), distances[identifier])
                 probability += (sorting_scen - all_scen)
+            # Apparently this is only called if the for-loop did not break
+            # This seems to be very fancy!
+            else:
+                if probability > highest_prob:
+                    highest_prob = probability
+                    ancestor = candidate
 
-            if probability > highest_prob:
-                highest_prob = probability
-                ancestor = candidate
 
         #for single_component in nx.connected_component_subgraphs(inter_info.circular_breakpoint):
         #    if len(single_component.nodes()) == 2:
