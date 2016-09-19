@@ -6,13 +6,11 @@
 import argparse as args
 import sys
 import networkx as nx
-import math
-#import bigfloat
+
 
 from input_parser import Input
 from genome_sampler import Genome_Sampler
 from model import Genome
-from model import Adjacency
 from ig_info import Intermediate_Genome as IG
 import calculate_probability
 #################################
@@ -99,8 +97,8 @@ while pairwise_genomes:
             candidate = sampler.enumerate_vertices()
             expected_distances = {}
             probability = 0
-            for identifier, genome in all_genomes.items():
-                expected_distances[identifier] = genome.distance_to_genome(candidate)
+            #for identifier, genome in all_genomes.items():
+            #    expected_distances[identifier] = genome.distance_to_genome(candidate)
                 #expected_distance = genome.distance_to_genome(candidate)
 
             #if any(expected_distances[ident] < distances[ident] for ident in all_genomes.keys()):
@@ -114,9 +112,14 @@ while pairwise_genomes:
                 breakpoint_graph.create_circular_graph()
                 breakpoint_graph = breakpoint_graph.circular_breakpoint
 
+                no_cycles = len(nx.connected_component_subgraphs(breakpoint_graph))
+                distance = candidate.length() - no_cycles
+
+                if distance < distances[indent]:
+                    break
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
-                all_scen = calculate_probability.all_scenarios(genome.adj_length(), expected_distances[identifier])
+                all_scen = calculate_probability.all_scenarios(genome.adj_length(), distances[identifier])
                 probability += (sorting_scen - all_scen)
 
             if probability > highest_prob:
