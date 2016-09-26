@@ -92,9 +92,9 @@ while pairwise_genomes:
         # TUESDAY 13 SEPTEMBER. STARTING ALL OVER :) #
         ##############################################
         ##############################################
-        i = 0
-        while i != arguments.repetition:
-        #for i in range(arguments.repetition):
+        #i = 0
+        #while i != arguments.repetition:
+        for i in range(arguments.repetition):
             candidate = sampler.enumerate_vertices()
             expected_distances = {}
             probability = 0
@@ -117,7 +117,7 @@ while pairwise_genomes:
             # Apparently this is only called if the for-loop did not break
             # This seems to be very fancy!
             else:
-                i += 1
+                #i += 1
                 if probability > highest_prob:
                     highest_prob = probability
                     ancestor = candidate
