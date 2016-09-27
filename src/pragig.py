@@ -107,8 +107,8 @@ while pairwise_genomes:
                 no_cycles = nx.number_connected_components(breakpoint_graph)
                 distance = candidate.length() - no_cycles
 
-                if distance < distances[identifier]:
-                    break
+                #if distance < distances[identifier]:
+                #   break
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
                 all_scen = calculate_probability.all_scenarios(genome.adj_length(), distances[identifier])
@@ -116,11 +116,11 @@ while pairwise_genomes:
 
             # Apparently this is only called if the for-loop did not break
             # This seems to be very fancy!
-            else:
+            #else:
                 #i += 1
-                if probability > highest_prob:
-                    highest_prob = probability
-                    ancestor = candidate
+            if probability > highest_prob:
+                highest_prob = probability
+                ancestor = candidate
 
 
     ancestor.name = "%s%s" % (names[0], names[1])
