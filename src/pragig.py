@@ -131,7 +131,11 @@ while pairwise_genomes:
                     ancestor = candidate
 
 
-    ancestor.name = "%s%s" % (names[0], names[1])
+    try:
+        ancestor.name = "%s%s" % (names[0], names[1])
+    except AttributeError:
+        print >> sys.stderr, "No ancestor found. Sorry!"
+        continue
 
     clade = input.tree[0].common_ancestor(names[0],names[1])
     clade.name = ancestor.name
