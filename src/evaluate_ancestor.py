@@ -42,6 +42,7 @@ while leaves:
     try:
         genome_calculated = Genome("calc", calculated_ancestors[new_key])
     except KeyError:
+        print "%s;%d;0;0;%d;0;0;1;" % (new_key, distance, genome_reference.adj_length())
         continue
 
     true_positives = sum(1 for adj in genome_calculated.adjacency_set if adj in genome_reference.adjacency_set)
