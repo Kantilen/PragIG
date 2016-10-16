@@ -5,6 +5,7 @@
 #################################
 import sys
 import os
+import copy
 from Bio import Phylo
 #################################
 
@@ -43,6 +44,24 @@ class Input:
         :return: Some BioPython Object containing information of the tree.
         '''
         newick_tree = Phylo.read(tree, 'newick')
+        copied_tree = copy.deepcopy(newick_tree)
+
+        for node in copied_tree.get_nonterminals(order="postorder"):
+            leaves = node.find_clades()
+            leaves = [x for x in leaves if x.name]
+
+            original_leaves = []
+            for leaf in leaves:
+                original_leaf = newick_tree.find_clades(leaf.name)
+                original_leaves.extend([x for x in original_leaf])
+
+            original_node = newick_tree.common_ancestor(original_leaves)
+            original_node.name = "".join([x.name for x in leaves if x.name])
+
+            node.name = "".join([x.name for x in leaves if x.name])
+
+            for leaf in leaves:
+                copied_tree.collapse(leaf)
         return (newick_tree, max(newick_tree.depths().values()))
 
 

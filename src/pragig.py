@@ -14,9 +14,51 @@ from genome_sampler import Genome_Sampler
 from model import Genome
 from ig_info import Intermediate_Genome as IG
 import calculate_probability
+from Bio import Phylo
+import copy
 #################################
 
 __author__ = 'klamkiewicz'
+
+def find_ancestral_weights(tree, extant_genomes):
+    ''' TEST FUNCTION '''
+    #print >> sys.stderr, extant_genomes
+    #print >> sys.stderr, tree
+    anc_weights = {}
+    all_internal_nodes = tree.get_nonterminals()
+
+    for ancestor in all_internal_nodes:
+
+        #print >> sys.stderr, ancestor.name
+        label = ancestor.name
+        t = copy.deepcopy(tree)
+        t.root_with_outgroup({'name' : label})
+
+        weights = {}
+        for node in t.find_clades(order="postorder"):
+            if node.is_terminal():
+                weights[node.name] = {adj : 1 for adj in extant_genomes[node.name].adjacency_set}
+                continue
+
+            d = 0
+            all_adj = set()
+            children = list(node.find_clades())
+            children = [x for x in children if x != node]
+
+            for child in children:
+                all_adj.update(weights[child.name].iterkeys())
+                d += child.branch_length
+            if d == 0:
+                d = 0.1
+            node_adj_weights = {}
+            for adj in all_adj:
+                children_w = [weights[child.name][adj] * (d - child.branch_length) if adj in weights[child.name] else 0
+                              for child in children]
+                node_adj_weights[adj] = sum(children_w) / (d * (len(children) -1 ))
+
+            weights[node.name] = node_adj_weights
+        anc_weights[label] = weights[ancestor.name]
+    return anc_weights
 
 # Commandline arguments
 parser = args.ArgumentParser(description="Enter two genomes in the input format of Unimog")
@@ -37,10 +79,13 @@ pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
 all_leaves = input.find_all_leaves(input.tree[0])
 max_length = int(input.tree[1])
 
+
 all_genomes = {}
 
 for leaf in all_leaves:
     all_genomes[leaf.name] = Genome(leaf.name, input.genomes[leaf.name])
+
+anc_weights = find_ancestral_weights(input.tree[0], all_genomes)
 
 gene_number = all_genomes.values()[0].adj_length()
 calculate_probability.preprocess_transitions(2*max_length, gene_number)
