@@ -18,10 +18,11 @@ class Genome_Sampler():
     This class generates sampled genomes from the given data.
     It returns a list of potential ancestral genomes.
     '''
-    def __init__(self, graph):
+    def __init__(self, graph, weights):
         #self.iteration = iter
 
         self.graph = graph
+        self.weights = weights
         #self.conflicting_adjacencies = defaultdict(set)
         #self.preprocess_conflicts()
         #self.sampled_genomes = []
@@ -29,15 +30,62 @@ class Genome_Sampler():
         #self.intermediate_cycle = self.enumerate_vertices()
         #print self.create_adjacency_from_cycle(self.graph)
 
+    def weighted_choice(self, choices):
+        rnd = random.uniform(0,1)
+        tmp = 0
+        #print choices, rnd
+
+        for choice, weight in choices.items():
+            if tmp + weight >= rnd:
+                return choice
+            tmp += weight
+
+
     #@staticmethod
     def create_adjacency_from_cycle(self, cycle):
         if not cycle:
             return []
         assert(len(cycle) % 2 == 0)
 
-        adj = random.randint(0, len(cycle)/2 -1) * 2 + 1
-        return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(cycle[0],cycle[adj])] + \
-               self.create_adjacency_from_cycle(cycle[adj+1:])
+        #if len(cycle) == 2:
+        #    return [model.Adjacency(cycle[0],cycle[1])]
+
+        first_ex = cycle[0]
+
+        ancestral_adj = [x for x in self.weights.keys() if x.contains_extremity(first_ex)]
+        ancestral_ex = set()
+        for adj in ancestral_adj:
+            ancestral_ex.update(adj.get_extremities())
+
+        ancestral_ex.remove(first_ex)
+
+        possible_adj = [x for x in ancestral_ex if x in cycle]
+        possible_w = 0
+
+        for second_ex in possible_adj:
+            possible_w += self.weights[model.Adjacency(first_ex,second_ex)]
+        needed_weights = {}
+        for second_ex in possible_adj:
+            needed_weights[second_ex] = self.weights[model.Adjacency(first_ex,second_ex)] / possible_w
+
+        second_ex = self.weighted_choice(needed_weights)
+        try:
+            adj = cycle.index(second_ex)
+        except:
+            print cycle, first_ex, second_ex, possible_adj, self.weights[model.Adjacency(first_ex,second_ex)]
+            print possible_w, needed_weights, ancestral_ex, ancestral_adj
+            sys.exit(0)
+
+
+        return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(first_ex, second_ex)] + \
+               self.create_adjacency_from_cycle(cycle[adj + 1:])
+
+
+        #sys.exit(0)
+
+        #adj = random.randint(0, len(cycle)/2 -1) * 2 + 1
+        #return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(cycle[0],cycle[adj])] + \
+        #       self.create_adjacency_from_cycle(cycle[adj+1:])
 
     def enumerate_vertices(self):
 

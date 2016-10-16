@@ -129,7 +129,7 @@ while pairwise_genomes:
         ancestor = second_genome
     else:
         ancestor = []
-        sampler = Genome_Sampler(inter_info.circular_breakpoint)
+        sampler = Genome_Sampler(inter_info.circular_breakpoint, anc_weights[lca.name])
 
         #all_IGs = []
         highest_prob = None
