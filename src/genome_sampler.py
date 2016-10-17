@@ -47,8 +47,8 @@ class Genome_Sampler():
             return []
         assert(len(cycle) % 2 == 0)
 
-        #if len(cycle) == 2:
-        #    return [model.Adjacency(cycle[0],cycle[1])]
+        if len(cycle) == 2:
+            return [model.Adjacency(cycle[0],cycle[1])]
 
         first_ex = cycle[0]
 
