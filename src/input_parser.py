@@ -61,7 +61,10 @@ class Input:
             node.name = "".join([x.name for x in leaves if x.name])
 
             for leaf in leaves:
-                copied_tree.collapse(leaf)
+                try:
+                    copied_tree.collapse(leaf)
+                except ValueError:
+                    print >> sys.stderr, "Error in collapsing: %s" % leaf
         return (newick_tree, max(newick_tree.depths().values()))
 
 
