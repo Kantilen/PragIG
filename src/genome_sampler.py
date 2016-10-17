@@ -51,16 +51,41 @@ class Genome_Sampler():
             return [model.Adjacency(cycle[0],cycle[1])]
 
         first_ex = cycle[0]
+        i = 0
+        while first_ex.startswith("Telo"):
+            i += 1
+            first_ex = cycle[i]
 
         ancestral_adj = [x for x in self.weights.keys() if x.contains_extremity(first_ex)]
         ancestral_ex = set()
         for adj in ancestral_adj:
             ancestral_ex.update(adj.get_extremities())
 
+
+        telomeres = [telo for telo in cycle if telo.startswith("Telo")]
+
         ancestral_ex.remove(first_ex)
+
+        if None in ancestral_ex:
+            if len(telomeres) == 1:
+                ancestral_ex.update(telomeres)
+            else:
+                telo_ig = [x for x in telomeres if (cycle.index(first_ex) - cycle.index(x)) % 2 != 0]
+                print telo_ig
+                ancestral_ex.update(telo_ig)
 
         possible_adj = [x for x in ancestral_ex if x in cycle]
         possible_w = 0
+
+        if any([x.startswith("Telo") for x in cycle]):
+            print cycle
+            print ancestral_ex
+            print telomeres
+            print possible_adj
+            sys.exit(0)
+
+
+
 
         for second_ex in possible_adj:
             possible_w += self.weights[model.Adjacency(first_ex,second_ex)]
