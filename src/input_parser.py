@@ -48,7 +48,7 @@ class Input:
 
         for node in copied_tree.get_nonterminals(order="postorder"):
             leaves = node.find_clades()
-            leaves = [x for x in leaves if x.name]
+            leaves = [x for x in leaves if x.name and x != node]
 
             original_leaves = []
             for leaf in leaves:
@@ -61,10 +61,8 @@ class Input:
             node.name = "".join([x.name for x in leaves if x.name])
 
             for leaf in leaves:
-                try:
-                    copied_tree.collapse(leaf)
-                except ValueError:
-                    print >> sys.stderr, "Error in collapsing: %s" % leaf
+                copied_tree.collapse(leaf)
+
         return (newick_tree, max(newick_tree.depths().values()))
 
 
