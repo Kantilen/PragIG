@@ -11,6 +11,7 @@ import random
 import sys
 import networkx as nx
 import model
+import numpy as np
 #################################
 
 class Genome_Sampler():
@@ -45,7 +46,11 @@ class Genome_Sampler():
     def create_adjacency_from_cycle(self, cycle):
         if not cycle:
             return []
-        assert(len(cycle) % 2 == 0)
+        try:
+            assert(len(cycle) % 2 == 0)
+        except AssertionError:
+            print cycle
+            return
 
         if len(cycle) == 2:
             return [model.Adjacency(cycle[0],cycle[1])]
@@ -56,51 +61,49 @@ class Genome_Sampler():
             i += 1
             first_ex = cycle[i]
 
+        inter_ex = [x for x in cycle if (cycle.index(x) + cycle.index(first_ex)) % 2 != 0]
+
+
+
         ancestral_adj = [x for x in self.weights.keys() if x.contains_extremity(first_ex)]
         ancestral_ex = set()
         for adj in ancestral_adj:
             ancestral_ex.update(adj.get_extremities())
-
-
-        telomeres = [telo for telo in cycle if telo.startswith("Telo")]
-
         ancestral_ex.remove(first_ex)
 
-        if None in ancestral_ex:
-            if len(telomeres) == 1:
-                ancestral_ex.update(telomeres)
-            else:
-                telo_ig = [x for x in telomeres if (cycle.index(first_ex) - cycle.index(x)) % 2 != 0]
-                print telo_ig
-                ancestral_ex.update(telo_ig)
+        possible_ex = [x for x in ancestral_ex if x in cycle]
 
-        possible_adj = [x for x in ancestral_ex if x in cycle]
-        possible_w = 0
+        telomeres = [telo for telo in cycle if telo.startswith("Telo") and telo in inter_ex]
 
-        if any([x.startswith("Telo") for x in cycle]):
-            print cycle
-            print ancestral_ex
-            print telomeres
-            print possible_adj
-            sys.exit(0)
+        if len(inter_ex) != len(possible_ex):
+            not_observed = [ex for ex in inter_ex if ex not in possible_ex]
+            possible_ex.extend(not_observed)
 
 
+        weights = []
+        for ex in possible_ex:
+            try:
+                if ex.startswith("Telo"):
+                    weights.append(self.weights[model.Adjacency(first_ex,None)])
+                else:
+                    weights.append(self.weights[model.Adjacency(first_ex,ex)])
+            except KeyError:
+                weights.append(0.05)
 
+        #if telomeres:
+        #    print first_ex, cycle
+        #    print telomeres
+        #    print ancestral_adj
+        #    for x in ancestral_adj:
+        #        print x, self.weights[x]
+        #    print possible_ex, weights
+        #    sys.exit(0)
 
-        for second_ex in possible_adj:
-            possible_w += self.weights[model.Adjacency(first_ex,second_ex)]
-        needed_weights = {}
-        for second_ex in possible_adj:
-            needed_weights[second_ex] = self.weights[model.Adjacency(first_ex,second_ex)] / possible_w
+        prob_sum = sum(weights)
+        weights = [x/prob_sum for x in weights]
 
-        second_ex = self.weighted_choice(needed_weights)
-        try:
-            adj = cycle.index(second_ex)
-        except:
-            print cycle, first_ex, second_ex, possible_adj, self.weights[model.Adjacency(first_ex,second_ex)]
-            print possible_w, needed_weights, ancestral_ex, ancestral_adj
-            sys.exit(0)
-
+        second_ex = np.random.choice(possible_ex, 1, p=weights)[0]
+        adj = cycle.index(second_ex)
 
         return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(first_ex, second_ex)] + \
                self.create_adjacency_from_cycle(cycle[adj + 1:])
