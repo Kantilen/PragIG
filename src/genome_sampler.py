@@ -49,8 +49,13 @@ class Genome_Sampler():
         try:
             assert(len(cycle) % 2 == 0)
         except AssertionError:
-            print cycle
-            return
+            adjacency = cycle[0]
+            for cycles in nx.connected_component_subgraphs(self.graph):
+                if adjacency in cycles:
+                    print adjacency
+                    print cycles
+                    print cycle
+
 
         if len(cycle) == 2:
             return [model.Adjacency(cycle[0],cycle[1])]
@@ -75,16 +80,19 @@ class Genome_Sampler():
 
         telomeres = [telo for telo in cycle if telo.startswith("Telo") and telo in inter_ex]
 
+        if telomeres:
+            print first_ex, cycle, possible_ex
+
         if len(inter_ex) != len(possible_ex):
             not_observed = [ex for ex in inter_ex if ex not in possible_ex]
             possible_ex.extend(not_observed)
-
 
         weights = []
         for ex in possible_ex:
             try:
                 if ex.startswith("Telo"):
                     weights.append(self.weights[model.Adjacency(first_ex,None)])
+                    print >> sys.stderr, "TELO HERE"
                 else:
                     weights.append(self.weights[model.Adjacency(first_ex,ex)])
             except KeyError:

@@ -9,6 +9,7 @@ import re
 import networkx as nx
 import numpy as np
 from model import Adjacency
+import sys
 #################################
 
 class Intermediate_Genome():
