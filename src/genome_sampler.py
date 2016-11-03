@@ -82,7 +82,8 @@ class Genome_Sampler():
             ancestral_ex.update(adj.get_extremities())
         ancestral_ex.remove(first_ex)
 
-        possible_ex = [x for x in ancestral_ex if x in cycle]
+        #possible_ex = [x for x in ancestral_ex if x in cycle]
+        possible_ex = [x for x in ancestral_ex if x in inter_ex]
 
         telomeres = [telo for telo in cycle if telo.startswith("Telo") and telo in inter_ex]
 
@@ -121,6 +122,17 @@ class Genome_Sampler():
 
         #if telomeres:
         #    print second_ex, adj
+
+
+        first_cycle = cycle[1:adj]
+        second_cycle = cycle[adj+1:]
+
+        if (len(first_cycle) % 2 != 0) or (len(second_cycle) % 2 != 0):
+            print cycle, first_ex, second_ex, adj
+            print first_cycle, second_cycle
+            print telomeres, possible_ex, weights
+            print inter_ex, ancestral_ex
+            sys.exit(1)
 
         return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(first_ex, second_ex)] + \
                self.create_adjacency_from_cycle(cycle[adj + 1:])
