@@ -72,7 +72,7 @@ parser.add_argument('-a', '--alpha', default=1.0, type=float, help="Tolerance fo
 arguments = parser.parse_args()
 
 # Genome content and tree file are read
-input = Input(arguments.G, arguments.T)
+input = Input(arguments.G, arguments.T, True)
 # Get all pairwise 'siblings' in the tree
 
 pairwise_genomes = input.find_pairwise_leaves(input.tree[0])

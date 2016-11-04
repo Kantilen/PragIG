@@ -19,7 +19,7 @@ parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that c
 
 arguments = parser.parse_args()
 
-reference = Input(arguments.R, arguments.T)
+reference = Input(arguments.R, arguments.T, False)
 
 calculated_ancestors = reference.read_genomes(arguments.I)
 leaves = reference.find_pairwise_leaves(reference.tree[0])
