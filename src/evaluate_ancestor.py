@@ -19,13 +19,22 @@ parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that c
 
 arguments = parser.parse_args()
 
-reference = Input(arguments.R, arguments.T)
+reference = Input(arguments.R, arguments.T, False)
 
 calculated_ancestors = reference.read_genomes(arguments.I)
 leaves = reference.find_pairwise_leaves(reference.tree[0])
 
+no_internal_nodes = len(reference.tree[0].get_nonterminals())
+no_leaves = len(reference.tree[0].get_terminals())
+no_nodes = no_leaves + no_internal_nodes
+not_reconstructed = no_nodes - len(calculated_ancestors)
+
+#print not_reconstructed, no_nodes, no_leaves, no_internal_nodes, len(calculated_ancestors)
 
 print "Node;Dist;TP;FP;NP;TP%;FP%;NP%"
+
+for i in range(not_reconstructed):
+    print "NA;NA;0;0;0;0;0;0"
 
 while leaves:
     pair = leaves.pop()
@@ -42,6 +51,7 @@ while leaves:
     try:
         genome_calculated = Genome("calc", calculated_ancestors[new_key])
     except KeyError:
+        #print "%s;%d;0;0;%d;0;0;1" % (new_key, distance, genome_reference.adj_length())
         continue
 
     true_positives = sum(1 for adj in genome_calculated.adjacency_set if adj in genome_reference.adjacency_set)

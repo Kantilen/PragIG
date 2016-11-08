@@ -32,7 +32,7 @@ class Adjacency():
             return False
 
     def __hash__(self):
-        return hash(self.__repr__())
+        return hash(self.first_ex) ^ hash(self.second_ex)
 
     def get_extremities(self):
         return [self.first_ex, self.second_ex]

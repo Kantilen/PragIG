@@ -5,6 +5,7 @@
 #################################
 import sys
 import os
+import copy
 from Bio import Phylo
 #################################
 
@@ -18,7 +19,7 @@ class Input:
     returned in a list.
     DEPENDENCY: BioPython
     '''
-    def __init__(self, genomes, tree):
+    def __init__(self, genomes, tree, rename):
         '''
         Validation of file paths and reading of the content
         :param genomes: Path to the genome content file
@@ -33,16 +34,36 @@ class Input:
             sys.exit(1)
 
         self.genomes = self.read_genomes(genomes)
-        self.tree = self.read_tree(tree)
+        self.tree = self.read_tree(tree, rename)
 
 
-    def read_tree(self,tree):
+    def read_tree(self,tree, rename):
         '''
         Reads the NEWICK tree! DEPENDENCY: BioPython
         :param tree: Path to the NEWICK tree
         :return: Some BioPython Object containing information of the tree.
         '''
         newick_tree = Phylo.read(tree, 'newick')
+
+        if rename:
+            copied_tree = copy.deepcopy(newick_tree)
+            for node in copied_tree.get_nonterminals(order="postorder"):
+                leaves = node.find_clades()
+                leaves = [x for x in leaves if x.name and x != node]
+
+                original_leaves = []
+                for leaf in leaves:
+                    original_leaf = newick_tree.find_clades(leaf.name)
+                    original_leaves.extend([x for x in original_leaf])
+
+                original_node = newick_tree.common_ancestor(original_leaves)
+                original_node.name = "".join([x.name for x in leaves if x.name])
+
+                node.name = "".join([x.name for x in leaves if x.name])
+
+                for leaf in leaves:
+                    copied_tree.collapse(leaf)
+
         return (newick_tree, max(newick_tree.depths().values()))
 
 
