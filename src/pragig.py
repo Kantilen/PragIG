@@ -32,11 +32,24 @@ def find_ancestral_weights(tree, extant_genomes):
         #print >> sys.stderr, ancestor.name
         label = ancestor.name
         t = copy.deepcopy(tree)
-        t.root_with_outgroup({'name' : label})
+        #print tree
+        #Phylo.draw_ascii(tree)
+
+        root = tree.get_nonterminals(order="level")[0]
+
+        if ancestor != root:
+            current = tree.find_clades(ancestor, order="level").next()
+            children = list(current.find_clades(order="postorder"))
+            children = [x.name for x in children if x != ancestor]
+            for child in children:
+                t.collapse(child)
+            t.root_with_outgroup({'name' : current.name})
 
         weights = {}
-        for node in t.find_clades(order="postorder"):
-            if node.is_terminal():
+        #for node in t.find_clades(order="postorder"):
+        for idx, node in enumerate(t.find_clades(order="postorder")):
+            #print idx, node, ancestor
+            if node.is_terminal() and node.name != ancestor.name:
                 weights[node.name] = {adj : 1 for adj in extant_genomes[node.name].adjacency_set}
                 continue
 
@@ -45,9 +58,12 @@ def find_ancestral_weights(tree, extant_genomes):
             children = list(node.find_clades())
             children = [x for x in children if x != node]
 
+
+
             for child in children:
                 all_adj.update(weights[child.name].iterkeys())
                 d += child.branch_length
+            #print d, len(all_adj)
             if d == 0:
                 d = 0.1
             node_adj_weights = {}
@@ -56,8 +72,15 @@ def find_ancestral_weights(tree, extant_genomes):
                               for child in children]
                 node_adj_weights[adj] = sum(children_w) / (d * (len(children) -1 ))
 
+            #if len(node_adj_weights) == 0:
+                #print "HELLO"
+
             weights[node.name] = node_adj_weights
-        anc_weights[label] = weights[ancestor.name]
+        root = t.find_clades().next()
+     #   print root
+        anc_weights[label] = weights[root.name]
+    #sys.exit(0)
+    #print [(x,len(anc_weights[x])) for x in anc_weights.keys()]
     return anc_weights
 
 # Commandline arguments
