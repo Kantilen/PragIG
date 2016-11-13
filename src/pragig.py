@@ -89,7 +89,7 @@ parser.add_argument('G', metavar='GENOMES', type=str, help="Path to the file tha
 parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that contains the NEWICK tree")
 parser.add_argument('-r', '--repetition', default=100, type=int, help="Number of sampled genomes for each ancestor, default: 100")
 parser.add_argument('-o', '--output_file', type=str, help="If defined, output is saved in the given file")
-parser.add_argument('-a', '--alpha', default=1.0, type=float, help="Tolerance for different distances in the calculation. Closer to 1 equals 0 tolerance")
+parser.add_argument('-a', '--alpha', default=1.0, type=float, help="Tolerance for different tree_distances in the calculation. Closer to 1 equals 0 tolerance")
 
 
 arguments = parser.parse_args()
@@ -124,9 +124,9 @@ while pairwise_genomes:
 
     print >> sys.stderr, names
 
-    distances = {}
+    tree_distances = {}
     for genome_name in all_genomes.keys():
-        distances[genome_name] = input.tree[0].distance(lca, genome_name)
+        tree_distances[genome_name] = input.tree[0].distance(lca, genome_name)
 
     first_genome = all_genomes[names[0]]
     second_genome = all_genomes[names[1]]
@@ -146,9 +146,9 @@ while pairwise_genomes:
     # Create the circular breakpoint graph of the two genomes
     inter_info.create_circular_graph()
 
-    if distances[names[0]] == 0.0:
+    if tree_distances[names[0]] == 0.0:
        ancestor = first_genome
-    elif distances[names[1]] == 0.0:
+    elif tree_distances[names[1]] == 0.0:
         ancestor = second_genome
     else:
         ancestor = []
@@ -177,17 +177,19 @@ while pairwise_genomes:
                 no_cycles = nx.number_connected_components(breakpoint_graph)
                 distance = candidate.length() - no_cycles
 
-                if distance <= (distances[identifier]*arguments.alpha):
+                # 13.11 - MOST STUPID thing ever. Switched the tree distance and genomic distance
+                # Fix now, write, check results tomorrow.
+                if tree_distances[identifier] <= (distance*arguments.alpha):
                    break
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
-                all_scen = calculate_probability.all_scenarios(genome.adj_length(), distances[identifier])
+                all_scen = calculate_probability.all_scenarios(genome.adj_length(), distance)
 
                 if arguments.alpha == 1.0:
                     probability += (sorting_scen - all_scen)
                 else:
-                    probability += (sorting_scen - all_scen) + math.log10(distance - arguments.alpha*distances[identifier]) - \
-                                   math.log10(distances[identifier] - arguments.alpha*distances[identifier])
+                    probability += (sorting_scen - all_scen) + math.log10(tree_distances[identifier] - arguments.alpha * distance) - \
+                                   math.log10(distance - arguments.alpha * distance)
 
 
 
