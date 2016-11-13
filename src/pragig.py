@@ -176,20 +176,31 @@ while pairwise_genomes:
 
                 no_cycles = nx.number_connected_components(breakpoint_graph)
                 distance = candidate.length() - no_cycles
+                # sometimes occurs if the distances are very short
+                # however, a distance of 0 doesn't make much sense
+                # in terms of... well.. everything. Number of optimal sorting scenarios of length 0?
+                # Number of ALL sorting scenarios of length 0? Both 1? 
+                if distance == 0:
+                    break
 
                 # 13.11 - MOST STUPID thing ever. Switched the tree distance and genomic distance
                 # Fix now, write, check results tomorrow.
                 if tree_distances[identifier] <= (distance*arguments.alpha):
-                   break
+                    print tree_distances[identifier], distance*arguments.alpha
+                    break
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
                 all_scen = calculate_probability.all_scenarios(genome.adj_length(), distance)
 
-                if arguments.alpha == 1.0:
-                    probability += (sorting_scen - all_scen)
-                else:
-                    probability += (sorting_scen - all_scen) + math.log10(tree_distances[identifier] - arguments.alpha * distance) - \
-                                   math.log10(distance - arguments.alpha * distance)
+                try:
+                    if arguments.alpha == 1.0:
+                        probability += (sorting_scen - all_scen)
+                    else:
+                        probability += (sorting_scen - all_scen) + math.log10(tree_distances[identifier] - arguments.alpha * distance) - \
+                                       math.log10(distance - arguments.alpha * distance)
+                except ValueError:
+                    print identifier, tree_distances[identifier], distance, arguments.alpha, distance*arguments.alpha
+                    sys.exit(0)
 
 
 

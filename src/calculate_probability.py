@@ -53,7 +53,7 @@ def optimal_scenarios(graph):
             continue
         #TODO: Check what's going on here.... float?
         distances[component] = int((len(component)/2) - 1)
-
+    result = 0
     upper = 0
     lower = 0
     prod = 1
@@ -64,7 +64,8 @@ def optimal_scenarios(graph):
             prod += math.log10(distance+1)
         #prod *= (distance + 1) ** (distance - 1)
 
-    return math.log10(math.factorial(upper)) - lower + prod
+    result = math.log10(math.factorial(upper)) - lower + prod
+    return result
 
 def all_scenarios(length, distance):
     result = 0
