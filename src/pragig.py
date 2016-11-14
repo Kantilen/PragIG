@@ -179,14 +179,19 @@ while pairwise_genomes:
                 # sometimes occurs if the distances are very short
                 # however, a distance of 0 doesn't make much sense
                 # in terms of... well.. everything. Number of optimal sorting scenarios of length 0?
-                # Number of ALL sorting scenarios of length 0? Both 1? 
+                # Number of ALL sorting scenarios of length 0? Both 1?
                 if distance == 0:
                     break
 
                 # 13.11 - MOST STUPID thing ever. Switched the tree distance and genomic distance
                 # Fix now, write, check results tomorrow.
-                if tree_distances[identifier] <= (distance*arguments.alpha):
-                    print tree_distances[identifier], distance*arguments.alpha
+                # 14.11 - Another fix; the probability is P(G_S) for d_k <= t_k
+                # and drops if d_k > t_k. Not the other way around.
+
+                threshold = tree_distances[identifier] * (2 - arguments.alpha)
+                #if tree_distances[identifier] <= (distance*arguments.alpha):
+                if threshold <= distance:
+                    print >> sys.stderr, tree_distances[identifier], distance*arguments.alpha
                     break
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
