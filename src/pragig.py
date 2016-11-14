@@ -191,7 +191,7 @@ while pairwise_genomes:
                 threshold = tree_distances[identifier] * (2 - arguments.alpha)
                 #if tree_distances[identifier] <= (distance*arguments.alpha):
                 if threshold <= distance:
-                    print >> sys.stderr, tree_distances[identifier], distance*arguments.alpha
+                    print >> sys.stderr, tree_distances[identifier], threshold, distance
                     break
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
@@ -201,8 +201,8 @@ while pairwise_genomes:
                     if arguments.alpha == 1.0:
                         probability += (sorting_scen - all_scen)
                     else:
-                        probability += (sorting_scen - all_scen) + math.log10(tree_distances[identifier] - arguments.alpha * distance) - \
-                                       math.log10(distance - arguments.alpha * distance)
+                        probability += (sorting_scen - all_scen) + math.log10(tree_distances[identifier]*(2-arguments.alpha) - distance) - \
+                                       math.log10(tree_distances[identifier]*(1-arguments.alpha))
                 except ValueError:
                     print identifier, tree_distances[identifier], distance, arguments.alpha, distance*arguments.alpha
                     sys.exit(0)
