@@ -96,11 +96,11 @@ parser.add_argument('-e', '--epsilon', default=0.05, type=float, help="Epsilon P
 
 arguments = parser.parse_args()
 
-if not 0 <= arguments.a <= 1:
+if not 0 <= arguments.alpha <= 1:
     arguments.a = 1
     print >> sys.stderr, "Invalid alpha parameter; Alpha set to 1.\nUse an alpha between 0 and 1."
 
-if not 0 <= arguments.e <= 0.1:
+if not 0 <= arguments.epsilon <= 0.1:
     arguments.e = 0.05
     print >> sys.stderr, "Invalid epsilon parameter; Epsilon set to 0.05.\nUse an epsilon between 0 and 0.1."
 
