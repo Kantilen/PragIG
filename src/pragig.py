@@ -197,25 +197,32 @@ while pairwise_genomes:
                 # Fix now, write, check results tomorrow.
                 # 14.11 - Another fix; the probability is P(G_S) for d_k <= t_k
                 # and drops if d_k > t_k. Not the other way around.
+                # 17.11 - NOW I got it...
 
-                threshold = tree_distances[identifier] * (2 - arguments.alpha)
-                #if tree_distances[identifier] <= (distance*arguments.alpha):
-                if threshold <= distance:
-                    print >> sys.stderr, tree_distances[identifier], threshold, distance
+                expected_distance = genome.distance_to_genome(candidate)
+                lower_bound = distance*arguments.alpha
+                upper_bound = (2-arguments.alpha)*expected_distance
+
+                if tree_distances[identifier] <= lower_bound or tree_distances[identifier] >= upper_bound:
                     break
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
                 all_scen = calculate_probability.all_scenarios(genome.adj_length(), distance)
+                prob_sampled_genomes = sorting_scen - all_scen
 
-                try:
-                    if arguments.alpha == 1.0:
-                        probability += (sorting_scen - all_scen)
+                #try:
+                if arguments.alpha == 1.0 or distance <= tree_distances[identifier] <= expected_distance:
+                    probability += prob_sampled_genomes
+                else:
+                    if tree_distances[identifier] <= distance:
+                        probability += prob_sampled_genomes + math.log10(tree_distances[identifier] - lower_bound) - \
+                                        math.log10(distance - lower_bound)
                     else:
-                        probability += (sorting_scen - all_scen) + math.log10(tree_distances[identifier]*(2-arguments.alpha) - distance) - \
-                                       math.log10(tree_distances[identifier]*(1-arguments.alpha))
-                except ValueError:
-                    print >> sys.stderr, identifier, tree_distances[identifier], distance, arguments.alpha, distance*arguments.alpha
-                    sys.exit(0)
+                        probability += prob_sampled_genomes + math.log10(upper_bound - tree_distances[identifier]) - \
+                                       math.log10(expected_distance*(1-arguments.alpha))
+                #except ValueError:
+                #    print >> sys.stderr, identifier, tree_distances[identifier], distance, arguments.alpha, distance*arguments.alpha
+                #    sys.exit(0)
 
 
 
