@@ -90,9 +90,19 @@ parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that c
 parser.add_argument('-r', '--repetition', default=100, type=int, help="Number of sampled genomes for each ancestor, default: 100")
 parser.add_argument('-o', '--output_file', type=str, help="If defined, output is saved in the given file")
 parser.add_argument('-a', '--alpha', default=1.0, type=float, help="Tolerance for different tree_distances in the calculation. Closer to 1 equals 0 tolerance")
+# 17.11.2016; a new parameter (hype). Just want to see what happens with higher tree-scale if I use different epsilons
+parser.add_argument('-e', '--epsilon', default=0.05, type=float, help="Epsilon Parameter. Assigns weights to intermediate adjacencies that are not observed in extant genomes; default:0.05")
 
 
 arguments = parser.parse_args()
+
+if not 0 <= arguments.a <= 1:
+    arguments.a = 1
+    print >> sys.stderr, "Invalid alpha parameter; Alpha set to 1.\nUse an alpha between 0 and 1."
+
+if not 0 <= arguments.e <= 0.1:
+    arguments.e = 0.05
+    print >> sys.stderr, "Invalid epsilon parameter; Epsilon set to 0.05.\nUse an epsilon between 0 and 0.1."
 
 # Genome content and tree file are read
 input = Input(arguments.G, arguments.T, True)
@@ -152,7 +162,7 @@ while pairwise_genomes:
         ancestor = second_genome
     else:
         ancestor = []
-        sampler = Genome_Sampler(inter_info.circular_breakpoint, anc_weights[lca.name])
+        sampler = Genome_Sampler(inter_info.circular_breakpoint, anc_weights[lca.name], arguments.e)
 
         #all_IGs = []
         highest_prob = None
@@ -204,7 +214,7 @@ while pairwise_genomes:
                         probability += (sorting_scen - all_scen) + math.log10(tree_distances[identifier]*(2-arguments.alpha) - distance) - \
                                        math.log10(tree_distances[identifier]*(1-arguments.alpha))
                 except ValueError:
-                    print identifier, tree_distances[identifier], distance, arguments.alpha, distance*arguments.alpha
+                    print >> sys.stderr, identifier, tree_distances[identifier], distance, arguments.alpha, distance*arguments.alpha
                     sys.exit(0)
 
 

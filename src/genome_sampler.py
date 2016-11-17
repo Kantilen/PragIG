@@ -19,11 +19,12 @@ class Genome_Sampler():
     This class generates sampled genomes from the given data.
     It returns a list of potential ancestral genomes.
     '''
-    def __init__(self, graph, weights):
+    def __init__(self, graph, weights, epsilon):
         #self.iteration = iter
 
         self.graph = graph
         self.weights = weights
+        self.epsilon = epsilon
         #self.conflicting_adjacencies = defaultdict(set)
         #self.preprocess_conflicts()
         #self.sampled_genomes = []
@@ -53,11 +54,11 @@ class Genome_Sampler():
             assert(len(cycle) % 2 == 0)
         except AssertionError:
             adjacency = cycle[0]
-            for cycles in nx.connected_component_subgraphs(self.graph):
-                if adjacency in cycles:
-                    print adjacency
-                    print cycles.nodes()
-                    print cycle
+            #for cycles in nx.connected_component_subgraphs(self.graph):
+            #    if adjacency in cycles:
+            #        print adjacency
+            #        print cycles.nodes()
+            #        print cycle
             sys.exit(1)
 
 
@@ -106,7 +107,7 @@ class Genome_Sampler():
                 else:
                     weights.append(self.weights[model.Adjacency(first_ex,ex)])
             except KeyError:
-                weights.append(0.05)
+                weights.append(self.epsilon)
 
 
 
@@ -127,12 +128,12 @@ class Genome_Sampler():
         first_cycle = cycle[1:adj]
         second_cycle = cycle[adj+1:]
 
-        if (len(first_cycle) % 2 != 0) or (len(second_cycle) % 2 != 0):
-            print cycle, first_ex, second_ex, adj
-            print first_cycle, second_cycle
-            print telomeres, possible_ex, weights
-            print inter_ex, ancestral_ex
-            sys.exit(1)
+        #if (len(first_cycle) % 2 != 0) or (len(second_cycle) % 2 != 0):
+        #    print cycle, first_ex, second_ex, adj
+        #    print first_cycle, second_cycle
+        #    print telomeres, possible_ex, weights
+        #    print inter_ex, ancestral_ex
+        #    sys.exit(1)
 
         return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(first_ex, second_ex)] + \
                self.create_adjacency_from_cycle(cycle[adj + 1:])
