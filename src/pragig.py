@@ -200,6 +200,8 @@ while pairwise_genomes:
                 # 17.11 - NOW I got it...
 
                 expected_distance = genome.distance_to_genome(candidate)
+                if not isinstance(expected_distance, int):
+                    break
                 lower_bound = distance*arguments.alpha
                 upper_bound = (2-arguments.alpha)*expected_distance
 

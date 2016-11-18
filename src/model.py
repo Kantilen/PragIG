@@ -9,6 +9,7 @@ import numpy as np
 from collections import Counter
 import networkx as nx
 import math
+import sys
 #################################
 
 __author__ = 'klamkiewicz'
@@ -146,8 +147,11 @@ class Genome():
         observed = sum(1 for adj in self.adjacency_set if not adj.is_telomere())
         all_adj = self.adj_length()
 
-        upper = math.log(1-((breakpoints*(2*all_adj -1) ) / (observed*(2*all_adj -2))))
-        lower = math.log(1 - (1/(all_adj-1)) - 1/all_adj)
+        try:
+            upper = math.log(1-((breakpoints*(2*all_adj -1) ) / (observed*(2*all_adj -2))))
+            lower = math.log(1 - (1/(all_adj-1)) - 1/all_adj)
+        except ValueError as error:
+            return error
         distance = upper / lower
         return int(math.floor(distance))
 
