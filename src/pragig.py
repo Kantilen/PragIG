@@ -180,6 +180,12 @@ while pairwise_genomes:
             probability = 0
 
             for identifier, genome in all_genomes.items():
+
+                #19.11 - Small change. Since outgroup information is included in the
+                #weighting scheme, it is not needed here anymore.
+                if not identifier in names:
+                    continue
+
                 breakpoint_graph = IG(genome, candidate)
                 breakpoint_graph.create_circular_graph()
                 breakpoint_graph = breakpoint_graph.circular_breakpoint
