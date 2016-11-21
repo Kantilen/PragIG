@@ -8,6 +8,7 @@ import input_parser
 from ig_info import Intermediate_Genome as IG
 import calculate_probability
 from model import Genome
+from Bio import Phylo
 
 
 __author__ = 'klamkiewicz'
@@ -51,10 +52,16 @@ while pairwise_genomes:
     ancestor = all_genomes[lca.name]
     children = [all_genomes[x] for x in names]
 
+    new_name = '%s%s' % (names[0], names[1])
+    all_genomes[new_name] = Genome(new_name, ancestor.content)
+
+    node = input.tree[0].find_clades(lca.name).next()
+    node.name = new_name
+
     probability = 0
 
     for child in children:
-        tree_distance = input.tree[0].distance(child.name, ancestor.name)
+        tree_distance = input.tree[0].distance(child.name, new_name)
         #inter_info = ig_info.Intermediate_Genome(child, ancestor)
         distance, breakpoint_graph = get_dcj_distance_from_BP(child, ancestor)
         expected_distance = child.distance_to_genome(ancestor)
@@ -71,7 +78,7 @@ while pairwise_genomes:
 
 
 
-    probabilities[ancestor.name] = probability
+    probabilities[new_name] = probability
     input.tree[0].collapse(names[0])
     input.tree[0].collapse(names[1])
     all_genomes.pop(names[0])
