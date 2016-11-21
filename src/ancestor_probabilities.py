@@ -68,6 +68,9 @@ while pairwise_genomes:
         lower_bound = distance * alpha
         upper_bound = (2 - alpha) * expected_distance
 
+        if tree_distance <= lower_bound or tree_distance >= upper_bound:
+            break
+
         sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
         all_scen = calculate_probability.all_scenarios(child.adj_length(), distance)
         probability = calculate_probability.calculate_prob_ancestor(probability, sorting_scen, all_scen,
