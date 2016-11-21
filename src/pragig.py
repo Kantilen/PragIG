@@ -254,7 +254,7 @@ def write_output():
 
     print >> sys.stderr, "Writing output files"
 
-    folder = "%s/PragIG_A%d_E%d_R%d/" % (arguments.O, arguments.alpha, arguments.epsilon, arguments.repetition)
+    folder = "%s/PragIG_A%s_E%s_R%d/" % (arguments.O, str(arguments.alpha), str(arguments.epsilon), arguments.repetition)
 
     if not os.path.exists(folder):
         os.mkdir(folder)
