@@ -78,7 +78,7 @@ while pairwise_genomes:
     all_genomes.pop(names[1])
     pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
 
-folder = "%s/ancestor_probs_A%d" % (arguments.O, alpha)
+folder = "%s/ancestor_probs_A%s" % (arguments.O, str(alpha))
 
 if not os.path.exists(arguments.O):
     os.mkdir(arguments.O)
