@@ -16,6 +16,8 @@ from ig_info import Intermediate_Genome as IG
 import calculate_probability
 from Bio import Phylo
 import copy
+from collections import defaultdict
+import os
 #################################
 
 __author__ = 'klamkiewicz'
@@ -87,8 +89,8 @@ def find_ancestral_weights(tree, extant_genomes):
 parser = args.ArgumentParser(description="Enter two genomes in the input format of Unimog")
 parser.add_argument('G', metavar='GENOMES', type=str, help="Path to the file that contains the information of extant genomes")
 parser.add_argument('T', metavar='TREE', type=str, help="Path to the file that contains the NEWICK tree")
+parser.add_argument('O', metavar='OUTPUT', type=str, help="Path to folder, where results are saved.")
 parser.add_argument('-r', '--repetition', default=100, type=int, help="Number of sampled genomes for each ancestor, default: 100")
-parser.add_argument('-o', '--output_file', type=str, help="If defined, output is saved in the given file")
 parser.add_argument('-a', '--alpha', default=1.0, type=float, help="Tolerance for different tree_distances in the calculation. Closer to 1 equals 0 tolerance")
 # 17.11.2016; a new parameter (hype). Just want to see what happens with higher tree-scale if I use different epsilons
 parser.add_argument('-e', '--epsilon', default=0.05, type=float, help="Epsilon Parameter. Assigns weights to intermediate adjacencies that are not observed in extant genomes; default:0.05")
@@ -124,6 +126,14 @@ gene_number = all_genomes.values()[0].adj_length()
 calculate_probability.preprocess_transitions(2*max_length, gene_number)
 
 potential_ancestors = {}
+all_probabilities = defaultdict(list)
+
+def get_dcj_distance_from_BP(genome, candidate):
+    breakpoint_graph = IG(genome, candidate)
+    breakpoint_graph.create_circular_graph()
+    breakpoint_graph = breakpoint_graph.circular_breakpoint
+    no_cycles = nx.number_connected_components(breakpoint_graph)
+    return (candidate.length() - no_cycles, breakpoint_graph)
 
 
 # main iteration
@@ -132,7 +142,7 @@ while pairwise_genomes:
     names = pair[0]
     lca = input.tree[0].common_ancestor(names)
 
-    print >> sys.stderr, names
+    print >> sys.stderr, "Resolving %s%s..." % (names[0], names[1])
 
     tree_distances = {}
     for genome_name in all_genomes.keys():
@@ -166,7 +176,7 @@ while pairwise_genomes:
 
         #all_IGs = []
         highest_prob = None
-
+        probs = []
         ##############################################
         ##############################################
         # TUESDAY 13 SEPTEMBER. STARTING ALL OVER :) #
@@ -176,7 +186,6 @@ while pairwise_genomes:
         #while i != arguments.repetition:
         for i in range(arguments.repetition):
             candidate = sampler.enumerate_vertices()
-            expected_distances = {}
             probability = 0
 
             for identifier, genome in all_genomes.items():
@@ -186,12 +195,7 @@ while pairwise_genomes:
                 if not identifier in names:
                     continue
 
-                breakpoint_graph = IG(genome, candidate)
-                breakpoint_graph.create_circular_graph()
-                breakpoint_graph = breakpoint_graph.circular_breakpoint
-
-                no_cycles = nx.number_connected_components(breakpoint_graph)
-                distance = candidate.length() - no_cycles
+                distance, breakpoint_graph = get_dcj_distance_from_BP(genome, candidate)
                 # sometimes occurs if the distances are very short
                 # however, a distance of 0 doesn't make much sense
                 # in terms of... well.. everything. Number of optimal sorting scenarios of length 0?
@@ -216,27 +220,13 @@ while pairwise_genomes:
 
                 sorting_scen = calculate_probability.optimal_scenarios(breakpoint_graph)
                 all_scen = calculate_probability.all_scenarios(genome.adj_length(), distance)
-                prob_sampled_genomes = sorting_scen - all_scen
-
-                #try:
-                if arguments.alpha == 1.0 or distance <= tree_distances[identifier] <= expected_distance:
-                    probability += prob_sampled_genomes
-                else:
-                    if tree_distances[identifier] <= distance:
-                        probability += prob_sampled_genomes + math.log10(tree_distances[identifier] - lower_bound) - \
-                                        math.log10(distance - lower_bound)
-                    else:
-                        probability += prob_sampled_genomes + math.log10(upper_bound - tree_distances[identifier]) - \
-                                       math.log10(expected_distance*(1-arguments.alpha))
-                #except ValueError:
-                #    print >> sys.stderr, identifier, tree_distances[identifier], distance, arguments.alpha, distance*arguments.alpha
-                #    sys.exit(0)
-
-
-
+                probability = calculate_probability.calculate_prob_ancestor(probability, sorting_scen, all_scen, arguments.alpha,
+                                                                            distance, tree_distances[identifier], expected_distance,
+                                                                            lower_bound, upper_bound)
             # Apparently this is only called if the for-loop did not break
             # This seems to be very fancy!
             else:
+                probs.append(probability)
                 if probability > highest_prob:
                     highest_prob = probability
                     ancestor = candidate
@@ -247,7 +237,7 @@ while pairwise_genomes:
     except AttributeError:
         print >> sys.stderr, "No ancestor found. Sorry!"
         continue
-
+    all_probabilities[ancestor.name] = probs
     clade = input.tree[0].common_ancestor(names[0],names[1])
     clade.name = ancestor.name
     input.tree[0].collapse(names[0])
@@ -257,39 +247,70 @@ while pairwise_genomes:
     input.genomes.update({ancestor.name:ancestor.content})
     all_genomes[ancestor.name] = ancestor
     pairwise_genomes = input.find_pairwise_leaves(input.tree[0])
-
+    #print all_probabilities.items(), "\n", max(all_probabilities.values()), highest_prob
 ###############################################################################################
 
-
-
 def write_output():
-    if arguments.output_file:
-        output = open(arguments.output_file, 'w')
+
+    print >> sys.stderr, "Writing output files"
+
+    folder = "PragIG_%s/A%d_E%d_R%d/" % (arguments.O, arguments.alpha, arguments.epsilon, arguments.repetition)
+
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+
+    ancestor_file = folder + "pragig_ancestral.txt"
+    probability_file = folder + "pragig_probabilities.txt"
+
+    ancestor = open(ancestor_file, 'w')
+    probability = open(probability_file, 'w')
 
     for result_name, result_content in input.genomes.items():
-        result = Genome(result_name,result_content)
+        result = Genome(result_name, result_content)
         chromosome = result.chr_number()
 
-        if not arguments.output_file:
-            print '>',result_name
-        else:
-            output.write('>%s\n' % (result_name))
+        ancestor.write('>%s\n' % (result_name))
         for i in range(chromosome):
-            if not arguments.output_file:
-                print '# chr%d' % (i+1)
-            else:
-                output.write('#chr%d\n' % (i + 1))
+            ancestor.write('#chr%d\n' % (i + 1))
             for index, gene in enumerate(result_content):
-                if not arguments.output_file:
-                    print gene,
-                else:
-                    output.write("%s " % (gene))
+                ancestor.write('%s ' % (gene))
                 if gene == ')' or gene == '$':
                     result_content = result_content[index+1:]
-                    if not arguments.output_file:
-                        print
-                    else:
-                        output.write('\n')
+                    ancestor.write('\n')
                     break
+
+        if all_probabilities.has_key(result_name):
+            probability.write('>%s\n' % (result_name))
+            probability.write(' '.join(map(lambda n: '%.8f'%n ,all_probabilities[result_name])))
+            probability.write('\n')
+
+    #if arguments.output_file:
+    #output = open(arguments.output_file, 'w')
+
+    #for result_name, result_content in input.genomes.items():
+    #    result = Genome(result_name,result_content)
+    #    chromosome = result.chr_number()
+
+    #    if not arguments.output_file:
+    #        print '>',result_name
+    #    else:
+    #        output.write('>%s\n' % (result_name))
+    #    for i in range(chromosome):
+    #        if not arguments.output_file:
+    #            print '# chr%d' % (i+1)
+    #        else:
+    #            output.write('#chr%d\n' % (i + 1))
+    #        for index, gene in enumerate(result_content):
+    #            if not arguments.output_file:
+    #                print gene,
+    #            else:
+    #                output.write("%s " % (gene))
+    #            if gene == ')' or gene == '$':
+    #               result_content = result_content[index+1:]
+    #                if not arguments.output_file:
+    #                    print
+    #                else:
+    #                    output.write('\n')
+    #                break
 
 write_output()

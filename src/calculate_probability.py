@@ -72,3 +72,21 @@ def all_scenarios(length, distance):
     for i in range(int(distance)):
         result += (math.log10(length) + math.log10(length-1))
     return result
+
+def calculate_prob_ancestor(probability, sorting_scen, all_scen, alpha, distance, tree_distance, expected_distance, lower_bound, upper_bound):
+    prob_sampled_genomes = sorting_scen - all_scen
+    # try:
+    if alpha == 1.0 or distance <= tree_distance <= expected_distance:
+        probability += prob_sampled_genomes
+    else:
+        if tree_distance <= distance:
+            probability += prob_sampled_genomes + math.log10(tree_distance - lower_bound) - \
+                           math.log10(distance - lower_bound)
+        else:
+            probability += prob_sampled_genomes + math.log10(upper_bound - tree_distance) - \
+                           math.log10(expected_distance * (1 - alpha))
+            # except ValueError:
+            #    print >> sys.stderr, identifier, tree_distances[identifier], distance, arguments.alpha, distance*arguments.alpha
+            #    sys.exit(0)
+
+    return probability
