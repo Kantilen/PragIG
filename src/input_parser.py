@@ -6,6 +6,7 @@
 import sys
 import os
 import copy
+
 from Bio import Phylo
 #################################
 
@@ -41,10 +42,14 @@ class Input:
         '''
         Reads the NEWICK tree! DEPENDENCY: BioPython
         :param tree: Path to the NEWICK tree
+        :param rename: boolean variable, that indicates whether the internal nodes of the tree are renamed
+        based on their children
         :return: Some BioPython Object containing information of the tree.
         '''
         newick_tree = Phylo.read(tree, 'newick')
 
+        # if rename is True, each ancestral node gets a new label
+        # For this, the two children labels are joined together
         if rename:
             copied_tree = copy.deepcopy(newick_tree)
             for node in copied_tree.get_nonterminals(order="postorder"):
@@ -69,8 +74,8 @@ class Input:
 
     def read_genomes(self, genomes):
         '''
-        This function reads the genome content. At the moment the input has to look like
-        Pedros simulation in the /prj/genomesimul/ig_indel* folders.
+        This function reads the genome content.
+        At the moment only the GRIMM format is supported.
         :param genomes: Path to the genome content file
         :return: dictionary of the genome name as key and content as value
         '''
@@ -81,22 +86,16 @@ class Input:
             while 1:
                 current_genome = gene_content.readline()
                 if not current_genome:
-                    #value.append(')')
                     genome_content.update({key:value})
                     break
-
                 if current_genome.startswith('#'):
                     continue
-
                 if not current_genome.startswith('>'):
-                    #value.extend(current_genome.rstrip('$\n ').split(' '))
                     value.extend(current_genome.rstrip('\n ').split(' '))
-
                 else:
                     if not key:
                         key = current_genome.strip('\n>')
                         continue
-                    #value.append(')')
                     genome_content.update({key:value})
                     key = current_genome.strip('\n>')
                     value = []
@@ -107,19 +106,22 @@ class Input:
         '''
         Traverses a given tree and returns all pairwise genomes (same ancestor) as a list.
         :param tree:
-        :return:
+        :return: list of tuples. Each tuple represents two siblings in the tree.
         '''
         pairwise_genomes = []
 
         for clade in tree.find_clades():
             if clade.count_terminals() == 2:
                 leaves = clade.find_clades()
-                # NEW THING: if the clade had a name, it is entered here aswell.. Check if the addition works
-                # with the pragig script.
                 leaves = [x.name for x in leaves if x.name and not x == clade]
                 distances_to_ancestor = [clade.distance(leaves[0],clade), clade.distance(leaves[1],clade)]
                 pairwise_genomes.append((leaves,distances_to_ancestor))
         return pairwise_genomes
 
     def find_all_leaves(self, tree):
+        '''
+        Returns a list of all leaves in tree.
+        :param tree: NEWICK tree
+        :return: list of leaves
+        '''
         return tree.get_terminals()

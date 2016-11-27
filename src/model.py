@@ -1,19 +1,23 @@
 #!/usr/bin/python
+from __future__ import division
+
+__author__ = 'klamkiewicz'
 
 #################################
 # Import section                #
 #################################
-from __future__ import division
 import re
-import numpy as np
 from collections import Counter
-import networkx as nx
 import math
+
+import networkx as nx
 #################################
 
-__author__ = 'klamkiewicz'
-
 class Adjacency():
+    '''
+    Class that models adjacencies. Two extremities are needed in order to create an adjacency.
+    adj = Adjacency("1h","2t")
+    '''
     def __init__(self, first_ex, second_ex):
         self.first_ex = first_ex
         self.second_ex = second_ex
@@ -25,6 +29,12 @@ class Adjacency():
         return "(%s,%s)" % (self.first_ex, self.second_ex)
 
     def __eq__(self,other):
+        '''
+        New function to evaluate equality between adjacencies.
+        1h2t is the same adjacency as 2t1h. Therefore, the or connection in the if-statement is needed
+        :param other: Adjacency that has to be compared against
+        :return: Ture/False if the adjacencies are the same
+        '''
         if isinstance(other, Adjacency):
             return (self.first_ex == other.first_ex and self.second_ex == other.second_ex) or \
                (self.first_ex == other.second_ex and self.second_ex == other.first_ex)
@@ -32,24 +42,51 @@ class Adjacency():
             return False
 
     def __hash__(self):
+        '''
+        Same as __eq__, in order to use the adjacencies as keys in a dictionary, the hash function
+        has to be modified.
+        :return:
+        '''
         return hash(self.first_ex) ^ hash(self.second_ex)
 
     def get_extremities(self):
+        '''
+        Returns a list of the two extremities of the adjacency
+        :return: list of extremities
+        '''
         return [self.first_ex, self.second_ex]
 
     def is_telomere(self):
+        '''
+        Evaluates whether the adjacency is a telomere or not
+        :return: True/False
+        '''
         return (self.second_ex == None)
 
     def is_in_list(self, adj_list):
+        '''
+        Evaluates whether the adjacency is part of a component.
+        :param adj_list: Cycle/Component/List of adjacencies
+        :return: boolean value
+        '''
         return (self in adj_list)
 
     def contains_extremity(self, ext):
+        '''
+        Evaluates whether the extremity ext is part of this adjacency
+        :param ext: some extremity
+        :return: boolean value
+        '''
         if not ext:
             return False
         return (self.first_ex == ext or self.second_ex == ext)
 
 
 class Genome():
+    '''
+    This class models Genomes.
+    Only the GRIMM format is currently supported.
+    '''
     def __init__(self,name,content):
         self.name = name
         self.content = content
@@ -59,7 +96,7 @@ class Genome():
     def create_adjacency_set(self):
         '''
         This function reads the genome content and creates the adjacency set of it.
-        Note that the genome should be represented in the UniMog input notation.
+        Note that the genome should be represented in the GRIMM notation.
         The corresponding adjacency set is stored in the global variable.
         '''
         adjacencies = []  # returned value
@@ -105,70 +142,71 @@ class Genome():
 
         return adjacencies
 
-    def create_binary_vector(self, inter_adj, breakpoint_graph):
-        """
-        This function creates an numpy array that represents the binary vector of
-        graph in the two genomes that have to compared.
-        """
-        preprocessing_dict = dict.fromkeys(self.adjacency_set)  # This makes O(k+n) instead of O(k*n)!
-        binaries = []
-        #for component in nx.connected_component_subgraphs(breakpoint_graph):
-        binary = [1 if adj in preprocessing_dict else 0 for adj in inter_adj]
-        #for index, int_adj in enumerate(inter_adj):
-        #    if int_adj in preprocessing_dict:
-        #        np.put(binary, index, 1)
-
-        #for component in nx.connected_component_subgraphs(breakpoint_graph):
-        #    all_adj = self.adjacencies_from_comp(component)
-        #    one_comp_binary = [1 if adj in preprocessing_dict else 0 for adj in all_adj]
-        #    binaries.append(one_comp_binary)
-
-        #print binaries
-        return binary
-
-    def adjacencies_from_comp(self,comp):
-        enumerated_vertices = {}
-
-        first_adj = comp.edges()[0]
-        long_path = [x for x in nx.all_simple_paths(comp, first_adj[0], first_adj[1])][-1]
-        # assign value for each vertex from 0 to n
-        for index, vertex in enumerate(long_path):
-            enumerated_vertices[index] = vertex
-
-        all_adj = []
-        for i in range(len(enumerated_vertices)):
-            all_adj.extend([Adjacency(enumerated_vertices[i],enumerated_vertices[j]) for j in range(i,len(enumerated_vertices)) if ((j-i)%2 != 0)])
-
-        return all_adj
-
-    def distance_to_genome(self, other_genome):
+    def expected_distance_to_genome(self, other_genome):
+        '''
+        Calculates the expected DCJ distance between the genome and a second genome other_genome.
+        Equation is taken from Biller et al., 2015.
+        :param other_genome: Genome Object that saves the second genome
+        :return: expected DCJ distance of the two genomes
+        '''
         breakpoints = sum(1 for adj in other_genome.adjacency_set if not self.contains(adj))
         observed = sum(1 for adj in self.adjacency_set if not adj.is_telomere())
         all_adj = self.adj_length()
 
-        upper = math.log(1-((breakpoints*(2*all_adj -1) ) / (observed*(2*all_adj -2))))
-        lower = math.log(1 - (1/(all_adj-1)) - 1/all_adj)
+        try:
+            upper = math.log(1-((breakpoints*(2*all_adj -1) ) / (observed*(2*all_adj -2))))
+            lower = math.log(1 - (1/(all_adj-1)) - 1/all_adj)
+        except ValueError as error:
+            return error
         distance = upper / lower
         return int(math.floor(distance))
 
     def length(self):
+        '''
+        Returns the number of genes of the genome
+        :return: length of genome content
+        '''
         return len(self.content)
 
     def adj_length(self):
+        '''
+        Returns the number of adjacencies in the genome
+        :return: length of adjacency set
+        '''
         return len(self.adjacency_set)
 
     def contains(self,adjacency):
+        '''
+        Determines whether an adjacency is present in the genome or not
+        :param adjacency: The adjacency that has queried.
+        :return: boolean variable
+        '''
         return (adjacency in self.adjacency_set)
 
     def chr_number(self):
+        '''
+        Returns the number of chromosomes in the genome.
+        :return: Number of chromosomes
+        '''
         return Counter(self.content)['$'] + Counter(self.content)[')']
 
     def linear_chromosomes(self):
+        '''
+        Returns the number of LINEAR chromosomes in the genome.
+        :return: number of linear chromosomes
+        '''
         return Counter(self.content)['$']
 
 
     @staticmethod
     def genome_from_adjacencies(name, adjacency_set):
+        '''
+        Creates a new Genome() Object from a given adjacency set.
+        For this, the genome content in GRIMM format is reconstructed from the adjacency set.
+        :param name: name of the new genome
+        :param adjacency_set: the adjacency set that represents the content of the genome
+        :return: a new Genome() object
+        '''
         extremities = {'h': 't', 't':'h'}
         adjacencies = {}
         telomere = []
@@ -220,10 +258,6 @@ class Genome():
                 continue
 
             current_adjacency = adjacencies[other_extremity]
-#            try:
             adjacencies.pop(other_extremity)
- #           except KeyError:
-  #              current_adjacency = None
-   #             content.append(')')
 
         return Genome(name, content)
