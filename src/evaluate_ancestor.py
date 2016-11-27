@@ -1,16 +1,15 @@
 #!/usr/bin/python
 
+__author__ = 'klamkiewicz'
+
 #################################
 # Import section                #
 #################################
 import argparse as args
-import sys
 
 from model import Genome
 from input_parser import Input
 #################################
-
-__author__ = 'klamkiewicz'
 
 parser = args.ArgumentParser(description="Calculates the TP, FP and FN for one input file. Input has to be in the GRIMM format.")
 parser.add_argument('I', metavar='INPUT', type=str, help="Path to the txt-file produced by pragig.py")

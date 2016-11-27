@@ -1,17 +1,17 @@
 #!/usr/bin/python
-import itertools
 
 __author__ = 'klamkiewicz'
 
 #################################
 # Import section                #
 #################################
-from collections import defaultdict
 import random
 import sys
+
 import networkx as nx
-import model
 import numpy as np
+
+import model
 #################################
 
 class Genome_Sampler():
@@ -20,22 +20,18 @@ class Genome_Sampler():
     It returns a list of potential ancestral genomes.
     '''
     def __init__(self, graph, weights, epsilon):
-        #self.iteration = iter
-
         self.graph = graph
         self.weights = weights
         self.epsilon = epsilon
-        #self.conflicting_adjacencies = defaultdict(set)
-        #self.preprocess_conflicts()
-        #self.sampled_genomes = []
-        #self.create_genomes()
-        #self.intermediate_cycle = self.enumerate_vertices()
-        #print self.create_adjacency_from_cycle(self.graph)
 
     def weighted_choice(self, choices):
+        '''
+        Own weighted random choice method. Obsolete, since I use the numpy version now.
+        :param choices: dict with {choice : weight}
+        :return: choice based on the weights
+        '''
         rnd = random.uniform(0,1)
         tmp = 0
-        #print choices, rnd
 
         for choice, weight in choices.items():
             if tmp + weight >= rnd:
@@ -44,21 +40,25 @@ class Genome_Sampler():
 
 
     def shift(self, cycle):
+        '''
+        Puts the first element of a list to the end of this list
+        :param cycle: list of extremities
+        :return: modified list
+        '''
         return cycle[1:] + cycle[:1]
 
-    #@staticmethod
     def create_adjacency_from_cycle(self, cycle):
+        '''
+        Samples one intermediate adjacencies from cycle. Then, a recursive call is made
+        to proceed with the two new sub-cycles.
+        :param cycle: list of extremities in one component
+        :return: list of intermediate adjacencies
+        '''
         if not cycle:
             return []
         try:
             assert(len(cycle) % 2 == 0)
         except AssertionError:
-            adjacency = cycle[0]
-            #for cycles in nx.connected_component_subgraphs(self.graph):
-            #    if adjacency in cycles:
-            #        print adjacency
-            #        print cycles.nodes()
-            #        print cycle
             sys.exit(1)
 
 
@@ -67,82 +67,51 @@ class Genome_Sampler():
 
         first_ex = cycle[0]
 
+        # If the first extremity is a Telomere, the procedure won't work, since telomeres are not
+        # part of the ancestral weights.
         while first_ex.startswith("Telo"):
-        #    print "ROLLING"
-        #    print cycle
             cycle = list(np.roll(cycle,-1))
-        #    print cycle
-        #    print "ROLLING DONE"
             first_ex = cycle[0]
 
+        # Find possible intermediate adjacencies
         inter_ex = [x for x in cycle if (cycle.index(x) + cycle.index(first_ex)) % 2 != 0]
-
+        # Find all adjacencies that contain the fixed extremity in the ancestral weight dict
         ancestral_adj = [x for x in self.weights.keys() if x.contains_extremity(first_ex)]
         ancestral_ex = set()
         for adj in ancestral_adj:
             ancestral_ex.update(adj.get_extremities())
         ancestral_ex.remove(first_ex)
 
-        #possible_ex = [x for x in ancestral_ex if x in cycle]
+        # Filter the observed adjacencies with possible intermediate adjacencies.
         possible_ex = [x for x in ancestral_ex if x in inter_ex]
 
-        telomeres = [telo for telo in cycle if telo.startswith("Telo") and telo in inter_ex]
-
-        #if telomeres:
-        #    print "Before", first_ex, cycle, possible_ex
-
+        # If there are more intermediate adjacencies possible then observed,
+        # these adjacencies are added as well with weight epsilon.
         if len(inter_ex) != len(possible_ex):
             not_observed = [ex for ex in inter_ex if ex not in possible_ex]
             possible_ex.extend(not_observed)
-
-        #if telomeres:
-        #    print "After", first_ex, cycle, possible_ex
 
         weights = []
         for ex in possible_ex:
             try:
                 if ex.startswith("Telo"):
                     weights.append(self.weights[model.Adjacency(first_ex,None)])
-        #            print >> sys.stderr, "TELO HERE"
+
                 else:
                     weights.append(self.weights[model.Adjacency(first_ex,ex)])
             except KeyError:
                 weights.append(self.epsilon)
 
-
-
         prob_sum = sum(weights)
         weights = [x/prob_sum for x in weights]
 
-        #if telomeres:
-        #    print "Weights", weights
-
+        # sampled a random second extremity based on the weights
         second_ex = np.random.choice(possible_ex, 1, p=weights)[0]
 
         adj = cycle.index(second_ex)
-
-        #if telomeres:
-        #    print second_ex, adj
-
-
-        first_cycle = cycle[1:adj]
-        second_cycle = cycle[adj+1:]
-
-        #if (len(first_cycle) % 2 != 0) or (len(second_cycle) % 2 != 0):
-        #    print cycle, first_ex, second_ex, adj
-        #    print first_cycle, second_cycle
-        #    print telomeres, possible_ex, weights
-        #    print inter_ex, ancestral_ex
-        #    sys.exit(1)
-
+        # recursive call to sample adjacencies from the sub-cycles.
         return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(first_ex, second_ex)] + \
                self.create_adjacency_from_cycle(cycle[adj + 1:])
-
-        #sys.exit(0)
-
-        #adj = random.randint(0, len(cycle)/2 -1) * 2 + 1
-        #return self.create_adjacency_from_cycle(cycle[1:adj]) + [model.Adjacency(cycle[0],cycle[adj])] + \
-        #       self.create_adjacency_from_cycle(cycle[adj+1:])
 
     def enumerate_vertices(self):
 
@@ -162,72 +131,3 @@ class Genome_Sampler():
             cycle = [x for y in cycle for x in y]
             #return cycle
             return model.Genome.genome_from_adjacencies('',cycle)
-
-    @staticmethod
-    def get_all(component, text):
-
-        if not component:
-            return [None]
-
-        if len(component) == 2:
-            return [model.Adjacency(component[0],component[1])]
-
-        assert(len(component) % 2 == 0)
-
-        ig = []
-        for k in range(1,len(component),2):
-            adj = model.Adjacency(component[0], component[k])
-            for left in Genome_Sampler.get_all(component[1:k], "LEFT%d"%k):
-                all_found = []
-                if not left:
-                    left = []
-                if type(left) == type([]) and left:
-                    all_found = [[adj] + [item] for item in left]
-                else:
-                    all_found = [adj,left]
-
-                all_found = [x for x in all_found if x]
-
-
-                for right in Genome_Sampler.get_all(component[k+1:], "RIGHT%d"%k):
-                    print all_found
-                    if not right:
-                        right = []
-                    if type(right) == type([]) and right:
-                        if len(all_found) == 1:
-                            all_found = [[item] + all_found for item in right]
-                        else:
-                            all_found = [[item] + [element] for item in right for element in all_found]
-                    else:
-                        print right
-                        all_found.extend([right])
-
-                    all_found = [x for x in all_found if x]
-                    ig.append(all_found)
-        return ig
-
-
-    def preprocess_conflicts(self):
-        for adj in self.graph:
-
-            if adj.first_ex:
-                self.conflicting_adjacencies[adj.first_ex].add(adj)
-            if adj.second_ex:
-                self.conflicting_adjacencies[adj.second_ex].add(adj)
-
-    def create_genomes(self):
-        for i in range(self.iteration):
-            print "Step %d" % (i)
-            sampled_genome = []
-            conflicts = dict.fromkeys((self.conflicting_adjacencies.keys()))
-
-            while conflicts:
-                new_adj = random.sample(conflicts.keys(), 2)
-                sampled_adj = self.conflicting_adjacencies[new_adj[0]].intersection(self.conflicting_adjacencies[new_adj[1]])
-                if not sampled_adj:
-                    continue
-
-                conflicts.pop(new_adj[0])
-                conflicts.pop(new_adj[1])
-                sampled_genome.append(list(sampled_adj)[0])
-            self.sampled_genomes.append(sampled_genome)

@@ -6,10 +6,11 @@ __author__ = 'klamkiewicz'
 # Import section                #
 #################################
 import re
+
 import networkx as nx
 import numpy as np
+
 from model import Adjacency
-import sys
 #################################
 
 class Intermediate_Genome():
@@ -160,56 +161,3 @@ class Intermediate_Genome():
                     index += 1
                     continue
         self.circular_breakpoint = G
-
-    def get_all_inter_adj(self):
-        '''
-        This function enumerates all vertices and finds the intermediate graph.
-        :param graph: circular breakpoint graph
-        :return: set of all intermediate graph
-        '''
-        # each component can be solved seperately
-        for component in nx.connected_component_subgraphs(self.circular_breakpoint):
-
-            enumerated_vertices = {}
-
-            first_adj = component.edges()[0]
-            long_path = [x for x in nx.all_simple_paths(component, first_adj[0], first_adj[1])][-1]
-            # assign value for each vertex from 0 to n
-            for index, vertex in enumerate(long_path):
-                enumerated_vertices[index] = vertex
-            # This is tricky. two vertices whose difference are odd form an intermediate adjacency.
-            # I have to ask Pedro for the theoretical background here.
-            for i in range(len(enumerated_vertices.keys())):
-                for j in range(i+1,len(enumerated_vertices.keys()),2):
-                    first = enumerated_vertices[i]
-                    second = enumerated_vertices[j]
-
-                    if first.startswith('Telo') and second.startswith('Telo'):
-                        continue
-                    if first.startswith('Telo'):
-                        self.inter_adj.add(Adjacency(second,first))
-                        continue
-                    #if second.startswith('Telo'):
-                    #    self.inter_adj.add(Adjacency(first,None))
-                    #    continue
-
-                    new_adj = Adjacency(first,second)
-                    if not new_adj.is_in_list(self.inter_adj):
-                        self.inter_adj.add(new_adj)
-        self.inter_adj = list(self.inter_adj)
-
-    def create_binary_vector(self):
-        '''
-        This function creates an numpy array that represents the binary vector of
-        graph in the two genomes that have to compared.
-        '''
-        for indent, adj_set in self.adjacencies.items():
-            preprocessing_dict = dict.fromkeys(adj_set) # This makes O(k+n) instead of O(k*n)!
-            binary = np.zeros([1, len(self.inter_adj)], dtype=int)
-
-            for index, int_adj in enumerate(self.inter_adj):
-                if int_adj in preprocessing_dict:
-                    np.put(binary, index, 1)
-                else:
-                    np.put(binary, index, 0)
-            self.binaries.update({indent: binary})
