@@ -13,7 +13,10 @@ cd PragIG
 pip install -r requirements.txt
 ```
 
-BioPython can be found here: 
+BioPython can be found here:
+```
+http://biopython.org/wiki/Download
+```
 
 # Running PragIG
 
