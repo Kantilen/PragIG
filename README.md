@@ -45,7 +45,8 @@ src/pragig.py $folder/extant_genomes.txt $folder/sim_tree.nwk $folder
 This will create a subfolder in the provided test folder with the results of PragIG.
 
 ## References
-*M. D. Braga and J. Stoye. “The solution space of sorting by DCJ”. In: J. Comput. Biol. 17.9 (Sept. 2010), pp. 1145–1165.
-*Pedro Feijão. “Reconstruction of ancestral gene orders using intermediate genomes”. In: BMC Bioinformatics 16.14 (2015).
-*Pedro Feijão and Eloi Araujo. “Fast ancestral gene order reconstruction of genomes with unequal gene content”. In: unpublished (2016)
-*P. Biller, L. Gueguen, and E. Tannier. “Moments of genome evolution by Double Cut-and-Join”. In: BMC Bioinformatics 16 Suppl 14 (2015),S7.
+
+* M. D. Braga and J. Stoye. “The solution space of sorting by DCJ”. In: J. Comput. Biol. 17.9 (Sept. 2010), pp. 1145–1165.
+* Pedro Feijão. “Reconstruction of ancestral gene orders using intermediate genomes”. In: BMC Bioinformatics 16.14 (2015).
+* Pedro Feijão and Eloi Araujo. “Fast ancestral gene order reconstruction of genomes with unequal gene content”. In: unpublished (2016)
+* P. Biller, L. Gueguen, and E. Tannier. “Moments of genome evolution by Double Cut-and-Join”. In: BMC Bioinformatics 16 Suppl 14 (2015),S7.
