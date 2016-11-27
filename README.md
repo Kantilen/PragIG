@@ -5,17 +5,14 @@ It extends this concept with a probabilistic approach and calculates several Int
 PragIG was implemented in the scope of a master thesis at the Bielefeld University.
 
 ## Installation
-PragIG is implemented in Python 2.7. Aside from dependencies stated in the requirements.txt, the BioPython package is used by PragIG as well.
+PragIG is implemented in Python 2.7. 
+All dependencies and needed libraries are stated in the requirements.txt; with the usage of pip, everything can be easily installed.
+There are no further installations or configurations needed.
 
 ```
 git clone https://github.com/klamkiew/PragIG.git
 cd PragIG
 pip install -r requirements.txt
-```
-
-BioPython can be found here:
-```
-http://biopython.org/wiki/Download
 ```
 
 ## Running PragIG
