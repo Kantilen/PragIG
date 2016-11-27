@@ -4,7 +4,7 @@ PragIG is a software for ancestral reconstruction of gene orders based on the co
 It extends this concept with a probabilistic approach and calculates several Intermediate Genomes and their probability of being the ancestor.
 PragIG was implemented in the scope of a master thesis at the Bielefeld University.
 
-# Installation
+## Installation
 PragIG is implemented in Python 2.7. Aside from dependencies stated in the requirements.txt, the BioPython package is used by PragIG as well.
 
 ```
@@ -18,7 +18,7 @@ BioPython can be found here:
 http://biopython.org/wiki/Download
 ```
 
-# Running PragIG
+## Running PragIG
 
 In order to run PragIG the script `pragig.py` is called. All other scripts in the folder are then imported and used by this main script.
 ```
@@ -32,7 +32,7 @@ The alpha parameter sets the strictness of a filter used by PragIG that discards
 The epsilon parameter is used to weight adjacencies that are part of an intermediate genome but not conserved in the extant genomes.
 The number of sampled genomes for each internal node is determined with the repetition parameter.
 
-# Testing PragIG
+## Testing PragIG
 
 There are five datasets in this repository that can be used to test PragIG.
 All this datasets have 12 extant genomes with 1000 genes for each genome.
